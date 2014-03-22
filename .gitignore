@@ -1,0 +1,7 @@
+/app/cache/*
+/app/logs/*
+!app/cache/.gitkeep
+!app/logs/.gitkeep
+/composer.phar
+/app/config/parameters.yml
+/vendor/knplabs/*
