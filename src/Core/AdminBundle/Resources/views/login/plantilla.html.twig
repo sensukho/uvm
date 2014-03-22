@@ -13,10 +13,11 @@
 <!-- Content -->
 <!-- Start Form -->
     <div id="cform" class="card move-form" style="">
-        <p>&nbsp;</p>
-        <p style="text-align:justify;">Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b> utilizando el botón que aparece debajo.</p>
+	<form id="register" method=GET action="{{ path('portal_register') }}">
+	    <p style="text-align:justify;">Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>.</p>
+            <input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Registro">
+	</form>
         <form id="inquiry" class="input-glow" method=POST action="{{ path('portal') }}">
-
             <br />
             <ul class="mpf">
                 <label for="conName">Usuario</label><input type="text" id="conName" name="username" value="{{ user }}" required/>
@@ -29,10 +30,11 @@
             </ul>
             <ul class="mpf">
                 <label>&nbsp;</label><input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Ingresar">
-            </ul> 
+		<label style="text-align:right;"><a href="{{ path('portal_reset_pass') }}">¿Olvidaste tu contraseña?</a></label>
+            </ul>
+		<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+	    <p style="text-align:justify;">Si tienes problemas para registrarte o para navegar por favor acude al Centro de Cómputo de tu campus.</p>
         </form>
-
-        <p style="text-align:justify;">Si tienes problemas para registrarte o para navegar por favor acude al Centro de Cómputo de tu campus.</p>
     </div>
 <!-- End Form -->
 <!-- Start Right Column -->
@@ -41,17 +43,24 @@
         <div id="widgets" style="left:40px">
             <div class="" style="display: block;">
                 <img src="/web/bundles/login/img/increasing-value.png" style="">
-
                 <p class="mpf widget-text" style=""><h2>&nbsp;&nbsp;Bienvenido a la red de UVM.</h2></p>
-            </div>      
-{% if msg %}
+            </div>
+	{% if msg %}
             <div class="" style="display: block;">
                 <p class="mpf widget-text" style=""></p>
             </div>
             <div class="" style="display: block;">
                 <p class="mpf widget-text" style=""><span>{{ msg }}</span></p>
             </div>      
-{% endif %}
+	{% endif %}
+            <div class="" style="display: block;">
+                <p class="mpf widget-text" style=""><h2>Si aún no cuentas con tu usuario y contraseña,<br />por favor <b>registrate</b></h2></p>
+            </div>
+            <div class="" style="display: block;">
+		<form method=GET action="{{ path('portal_register') }}">
+	                <input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Registro">
+		</form>
+            </div>
         </div>
 <!-- End Widgets -->
     </div>

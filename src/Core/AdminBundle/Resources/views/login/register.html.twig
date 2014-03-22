@@ -3,9 +3,6 @@
         
         <table border="0px" width="100%" height="auto" cellspacing="3" cellpading="3">
             <!--  BANER SUPERIOR -->
-            <tr cellspan="3">
-                <td align="center"><img src="/web/bundles/login/imgs/BannerH.jpg"></td>
-            </tr>
             <tr cellspan="3"><td>&nbsp;<br />&nbsp;</td></tr>
             <tr>
                 <td width="80%" align="center">
@@ -40,8 +37,10 @@
                             <td width="50%" align="left"><a href="login"><button type="button" name="" value="" class="css3button">Ingreso</button></a></td>
                             <td align="right"><a href="resetpass"><button type="button" name="" value="" class="css3button">Recuperar contraseña</button></a></td>
                             -->
-                            <td width="50%" align="left"><a href="/web/login{{ params }}">Ingreso</a></td>
-                            <td align="right"><a href="/web/resetpass{{ params }}">Recuperar contraseña</a></td>
+                            <td width="50%" align="left">
+				<a href="/web/login{{ params }}"><button type="button">Ingreso</button></a>
+			    </td>
+                            <td align="right"><a href="/web/resetpass{{ params }}"><button type="button">Recuperar contraseña</button></a></td>
                         </tr>
                         </table>
                     </div>
@@ -49,8 +48,5 @@
             </tr>
             <tr cellspan="3"><td>&nbsp;<br />&nbsp;</td></tr>
             <!--  BANER SUPERIOR -->
-            <tr>
-                <td align="center"><img src="/web/bundles/login/imgs/BannerH.jpg"</td>
-            </tr>
         </table>
 {% endblock %}

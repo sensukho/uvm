@@ -12,7 +12,7 @@
 *******************/
 
 #cform {
-    position: absolute;
+    position: fixed;
     width: 340px;
     min-height: 420px;
     padding: 15px 35px 0px 35px;
@@ -51,22 +51,51 @@
 *******/
 
 @media (max-width: 1024px) {
+    #register > #entrar {
+	height: 160px;
+        width: 800px;
+        margin: 5px 0;
+        padding: 5px;
+        -webkit-text-stroke: 0.10px;
+        font-size: 25pt;
+        font-style: normal;
+    }
+    #register > p {
+        margin: 5px 0;
+        padding: 5px;
+        font-size: 25pt;
+        font-style: normal;
+    }
     #inquiry {
         display: inline-block;
         height: auto;
-        width: 95%;
+        width: 66%;
         padding-bottom: 20px;
         margin-bottom: 20px;
         border: 0px solid #000;
     }
-    #inquiry > ul { float: left; margin-right: 10px; }
+    #inquiry > ul { float: right; margin-right: 10px; }
     #inquiry > ul > label { display: inline-block; margin: 18px 5px 0 0; vertical-align: top; }
     #inquiry > ul > #conName, #conEmail {
         height: 60px;
-        width: 250px;
+        width: 400px;
         margin: 5px 0;
         padding: 5px;
         -webkit-text-stroke: 0.10px;
+        font-size: 25pt;
+        font-style: normal;
+    }
+
+    #inquiry > p {
+        margin: 5px 0;
+        padding: 5px;
+        font-size: 25pt;
+        font-style: normal;
+    }
+
+    #inquiry > p > a {
+        margin: 5px 0;
+        padding: 5px;
         font-size: 25pt;
         font-style: normal;
     }
@@ -92,12 +121,13 @@
 }
 
 @media (min-width: 1025px) {
+    #register {
+	display: none;
+    }
     #inquiry {
         display: inline-block;
         height: auto;
         width: 350px;
-        padding-bottom: 20px;
-        margin-bottom: 20px;
     }
     #inquiry > ul { float: right; margin-right: 10px; }
     #inquiry > ul > label { display: inline-block; margin: 10px 5px 0 0; vertical-align: top; }
@@ -194,7 +224,7 @@
 }
 
 .sub-btn {
-    width: 204px; height: 30px;
+    width: 204px; height: 51px;
     line-height: 30px;
     margin-top: 20px;
 }
@@ -278,7 +308,7 @@
     float: right;
 }
 
-#widgets > div { display: none; clear: both; overflow:hidden; height: 63px; margin-bottom:22px; }
+#widgets > div { display: none; clear: both; overflow:hidden; height: 75px; margin-bottom:22px; text-align: center; }
 #widgets > div > img { float: left; }
 
 /********************
