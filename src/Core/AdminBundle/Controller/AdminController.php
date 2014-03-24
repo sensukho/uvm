@@ -27,7 +27,7 @@ class AdminController extends Controller
         $user = $request->request->get('user',NULL);
         $pass = $request->request->get('pass',NULL);
         if( $user == 'admin' ){
-            if( $pass == '12345' ){
+            if( $pass == 'k04l4$' ){
                 $session = base64_encode( md5( $user.$pass.date('Y-n-d') ) );
                     $sesssion->set('session_admin', 'all');
                     $sesssion->set('session_id', $session);

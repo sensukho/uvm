@@ -12,7 +12,7 @@
 *******************/
 
 #cform {
-    position: fixed;
+    position: absolute;
     width: 340px;
     min-height: 420px;
     padding: 15px 35px 0px 35px;
@@ -30,13 +30,6 @@
 
 #cform.move-form { margin-left: -85px; margin-top: 5px; }
 
-@media (max-width: 1024px) {
-    #buttons    { height: 60px; margin: 10px 0 25px 0; padding: 10px; text-align: center; }
-}
-
-@media (min-width: 1025px) {
-    #buttons    { height: 32px; margin: 10px 0 25px 0; text-align: center; }
-}
 #buttons a  { display: inline-block; }
 
 .linkedin.button,
@@ -50,7 +43,24 @@
 * Form *
 *******/
 
+/****************************RESOLUTION MAX 1024****************************/
 @media (max-width: 1024px) {
+
+/*    @media handheld, only screen and (max-device-width : 800px) {*/
+
+    #cform {
+        display: block;
+        position: relative;
+        width: 100%;
+        padding: 15px 25px 35px;
+    }
+
+    #cform.move-form { margin: 15px 0 25px -25px; }
+
+    #rightClip {
+        display: none;
+    }
+
     #register > #entrar {
 	height: 160px;
         width: 800px;
@@ -118,8 +128,10 @@
         height: 55px;   
         width: 45px;
     }
+    #buttons    { height: 60px; margin: 10px 0 25px 0; padding: 10px; text-align: center; }
+    .widget-text { font-size: 40px; padding: 5px }
 }
-
+/****************************RESOLUTION MIN 1025****************************/
 @media (min-width: 1025px) {
     #register {
 	display: none;
@@ -159,8 +171,10 @@
         height: 35px;   
         width: 25px;
     }
+    #buttons    { height: 32px; margin: 10px 0 25px 0; text-align: center; }
+    .widget-text { font-size: 18px; padding: 5px }
 }
-
+/********************************************************/
 #inquiry > ul.fieldNotice {
     display: none;
     text-align: left;
@@ -269,8 +283,6 @@
 
 #widgets, #plans, #card, #crowd { width: 500px; }
 #card, #crowd { top: 18px; }
-
-.widget-text { font-weight: 500; }
 
 .theater > span {
     color: #f1f1f1;
@@ -482,21 +494,3 @@
 #crowdM2 { float: left; }
 #crowdM3 { float: right; }
 #crowdM4 { float: left; }
-
-
-@media handheld, only screen and (max-device-width : 800px) {
-
-    #cform {
-        display: block;
-        position: relative;
-        width: 100%;
-        padding: 15px 25px 35px;
-    }
-
-    #cform.move-form { margin: 15px 0 25px -25px; }
-
-    #rightClip {
-        display: none;
-    }
-
-}

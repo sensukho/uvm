@@ -7,7 +7,6 @@
         <div id="phone-call"><span class="tblue">
             <center><img src="/web/bundles/login/img/BannerT.jpg"></center>
         </div>
-
         <hr>
 <!-- End Title -->
 <!-- Content -->
@@ -15,8 +14,13 @@
     <div id="cform" class="card move-form" style="">
 	<form id="register" method=GET action="{{ path('portal_register') }}">
 	    <p style="text-align:justify;">Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>.</p>
-            <input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Registro">
+        <input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Registro">
 	</form>
+        {% if msg %}
+            <br />
+            <center><p class="mpf widget-text" style="background-color:brown;color:white">{{ msg }}</p></center>
+            <hr><hr>
+        {% endif %}
         <form id="inquiry" class="input-glow" method=POST action="{{ path('portal') }}">
             <br />
             <ul class="mpf">
@@ -45,14 +49,6 @@
                 <img src="/web/bundles/login/img/increasing-value.png" style="">
                 <p class="mpf widget-text" style=""><h2>&nbsp;&nbsp;Bienvenido a la red de UVM.</h2></p>
             </div>
-	{% if msg %}
-            <div class="" style="display: block;">
-                <p class="mpf widget-text" style=""></p>
-            </div>
-            <div class="" style="display: block;">
-                <p class="mpf widget-text" style=""><span>{{ msg }}</span></p>
-            </div>      
-	{% endif %}
             <div class="" style="display: block;">
                 <p class="mpf widget-text" style=""><h2>Si aún no cuentas con tu usuario y contraseña,<br />por favor <b>registrate</b></h2></p>
             </div>
@@ -70,7 +66,6 @@
     <div id="footer" class="" style="">
         <hr><hr>
         <div id="phone-call"><span class="tblue">
-
             <img src="/web/bundles/login/img/BannerT.jpg">
         </div>
         <hr>
