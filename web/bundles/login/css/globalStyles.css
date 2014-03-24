@@ -741,8 +741,8 @@ h1, h2, h3, h4, p, i, b, a { font-family: 'Open Sans', Arial, sans-serif; font-w
 .tblue, a, a:visited { color: #3e8ddd; }
 
 h1, h2, h3, h4 { text-rendering: optimizeLegibility; }
-h1    { font-size: 36pt; }
-h2    { font-size: 15pt; }
+h1    { font-size: 22pt; }
+h2    { font-size: 17pt; }
 h3    { font-size: 14pt; }
 h4    { font-size: 12pt; }
 p     { font-size: 10pt; }
@@ -754,8 +754,8 @@ span     { font-size: 20pt; }
     label { font-size: 15pt; }
 }
 
-h1, h2 { font-weight: 800; }
-h3, h4, p, a, label { font-weight: normal; -webkit-text-stroke: 0.15px; }
+h1, h2 { font-weight: 700; }
+h3, h4, p, a, label { font-weight: 500; -webkit-text-stroke: 0.15px; }
 /*
 textarea, input { font-weight: 500; }
 */

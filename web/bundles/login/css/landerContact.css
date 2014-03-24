@@ -320,7 +320,7 @@
     float: right;
 }
 
-#widgets > div { display: none; clear: both; overflow:hidden; height: 75px; margin-bottom:22px; text-align: center; }
+#widgets > div { display: none; clear: both; overflow:hidden; height: 85px; margin-bottom:22px; text-align: center; }
 #widgets > div > img { float: left; }
 
 /********************
