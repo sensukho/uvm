@@ -24,8 +24,8 @@ hr { background: #F1F1F1; }
 #contentbg {
 	margin: 0 auto;
 	position: relative;
-	max-width: 90%;
-	min-height: 100%;
+	max-width: 1024px;
+	min-height: 98%;
 	padding: 0px 50px 0;
 	background: #303030;
 	background: rgba(0,0,0,0.5);

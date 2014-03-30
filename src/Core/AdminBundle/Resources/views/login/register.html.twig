@@ -1,52 +1,60 @@
-{% extends 'CoreAdminBundle:login:layout.html.twig' %}
+{% extends 'CoreAdminBundle:login:layout_new.html.twig' %}
 {% block content %}
-        
-        <table border="0px" width="100%" height="auto" cellspacing="3" cellpading="3">
-            <!--  BANER SUPERIOR -->
-            <tr cellspan="3"><td>&nbsp;<br />&nbsp;</td></tr>
-            <tr>
-                <td width="80%" align="center">
-                    <div class="container">
 
-                        <table border="0px" width="80%" height="auto" cellspacing="3" cellpading="3">
-                            {% if msg %}
-                            <tr cellspan="2"><td><div id="msg">{{ msg }}<div></td></tr>
-                            {% endif %}
-                            <tr cellspan="2"><td>&nbsp;</td></tr>
-                            <!--
-                            <tr cellspan="2"><td align="center"><font size="3" color="#17039b">Llenar los siguientes campos tal y como están registrados en el sistema UVM.<br>Utilizar letras "Ñ" pero NO utilizar acentos.</td></tr>
-                            -->
-                            <tr cellspan="2"><td>&nbsp;</td></tr>
-                            <tr>
-                                <td width="60%" align="left">
-                                    <div style="margin-left:100px;">{{ form(form, {'attr': {'id': 'regform'}}) }}</div>
-                                </td>
-                                <td width="10%" align="center"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" align="center"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">&nbsp;<br />&nbsp;</td>
-                            </tr>
-                        </table>
-                        <!--  IMPRIME LOS BOTONES DE REGISTRO Y RECUPERACION (NO MODIFICAR) -->
-                        <table border="0px" width="50%" height="auto" cellspacing="3" cellpading="3">
-                        <tr>
-                            <!--
-                            <td width="50%" align="left"><a href="login"><button type="button" name="" value="" class="css3button">Ingreso</button></a></td>
-                            <td align="right"><a href="resetpass"><button type="button" name="" value="" class="css3button">Recuperar contraseña</button></a></td>
-                            -->
-                            <td width="50%" align="left">
-				<a href="/web/login{{ params }}"><button type="button">Ingreso</button></a>
-			    </td>
-                            <td align="right"><a href="/web/resetpass{{ params }}"><button type="button">Recuperar contraseña</button></a></td>
-                        </tr>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-            <tr cellspan="3"><td>&nbsp;<br />&nbsp;</td></tr>
-            <!--  BANER SUPERIOR -->
-        </table>
+<div id="contentbg" class="inv-box" style="">
+<!-- Title -->
+        <hr><hr>
+        <div id="phone-call"><span class="tblue">
+            <center><img src="/web/bundles/login/img/BannerT.jpg"></center>
+        </div>
+        <hr>
+<!-- End Title -->
+<!-- Content -->
+<!-- Start Form -->
+    <div id="cform" class="card move-form" style="">
+    <p class="mpf widget-text"><h2>Registro:</h2></p>
+	<form id="register" method=GET action="{{ path('portal_register') }}">
+	    <p style="text-align:justify;">Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>:</p>
+        <input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Registro">
+	</form>
+        {% if msg %}
+            <center><p class="mpf widget-text" style="background-color:brown;color:white">{{ msg }}</p></center>
+        {% endif %}
+        {{ form(form, {'attr': {'id': 'regform'}}) }}
+        <p>&nbsp;</p>
+        <p style="text-align:justify;">Si tienes problemas para registrarte o para navegar por favor acude al Centro de Cómputo de tu campus.</p>
+    </div>
+<!-- End Form -->
+<!-- Start Right Column -->
+    <div id="rightClip" class="mobile-remove">
+        <!-- Start Widgets -->
+        <div id="widgets" style="left:40px">
+            <div class="" style="display: block;">
+                <img src="/web/bundles/login/img/general.png" style="">
+                <p class="mpf widget-text" style=""><h3>Debes ingresar una cuenta válida de e-mail, ya que se te enviarán los datos de tu registro.</h3></p>
+            </div>
+            <div class="" style="display: block;">
+                <img src="/web/bundles/login/img/general.png" style="">
+                <p class="mpf widget-text" style=""><h3>Elije un nombre de usuario de por lo menos 5 caracteres y utiliza solo caracteres alfanuméricos.</h3></p>
+            </div>
+            <div class="" style="display: block;">
+                <img src="/web/bundles/login/img/general.png" style="">
+                <p class="mpf widget-text" style=""><h3>Elije una contraseña de por lo menos 6 caracteres y utiliza solo caracteres alfanuméricos.</h3></p>
+            </div>
+            <div class="" style="display: block;">
+        		<form method=GET action="{{ path('portal') }}">
+                   <input type="submit" id="entrar" name="id" id="sub-a" class="button blue sub-btn" value="Ingreso">
+                </form>
+            </div>
+        </div>
+<!-- End Widgets -->
+    </div>
+<!-- End Right Column -->
+<!-- End Content -->   
+    <div id="footer" class="" style="">
+        <hr><hr>
+        <div id="phone-call"><span class="tblue">
+            <img src="/web/bundles/login/img/BannerT.jpg">
+        </div>
+        <hr>
 {% endblock %}

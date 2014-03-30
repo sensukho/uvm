@@ -1,34 +1,56 @@
-{% extends 'CoreAdminBundle:login:layout.html.twig' %}
+{% extends 'CoreAdminBundle:login:layout_new.html.twig' %}
 {% block content %}
-        
-        <table border="0px" width="100%" height="auto" cellspacing="3" cellpading="3">
-            <tr cellspan="3"><td>&nbsp;<br />&nbsp;</td></tr>
-            <tr>
-                <td width="80%" align="center">
-                    <div class="container">
 
-                        <table border="0px" width="80%" height="auto" cellspacing="3" cellpading="3">
-                            {% if msg %}
-                            <tr cellspan="2"><div id="msg">{{ msg }}<div></tr>
-                            {% endif %}
-                            <tr cellspan="2">&nbsp;</tr>
-                            <tr>
-                                <td width="60%" align="left">
-                                    <div style="margin-left:100px;">{{ form(form) }}</div>
-                                </td>
-                                <td width="10%" align="center"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" align="center"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">&nbsp;<br />&nbsp;</td>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-            <tr cellspan="3"><td>&nbsp;<br />&nbsp;</td></tr>
-        </table>
-        
+<div id="contentbg" class="inv-box" style="">
+<!-- Title -->
+        <hr><hr>
+        <div id="phone-call"><span class="tblue">
+            <center><img src="/web/bundles/login/img/BannerT.jpg"></center>
+        </div>
+        <hr>
+<!-- End Title -->
+<!-- Content -->
+<!-- Start Form -->
+    <div id="cform" class="card move-form" style="">
+    <p class="mpf widget-text"><h2>Nueva contraseña:</h2></p>
+	<form id="register" method=GET action="{{ path('portal_register') }}">
+	    <p style="text-align:justify;">Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>:</p>
+        <input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Registro">
+	</form>
+        {% if msg %}
+            <center><p class="mpf widget-text" style="background-color:brown;color:white">{{ msg }}</p></center>
+        {% endif %}
+        {{ form(form, {'attr': {'id': 'regform'}}) }}
+        <p>&nbsp;</p>
+        <p style="text-align:justify;">Si tienes problemas para recuperar tu contraseña por favor acude al Centro de Cómputo de tu campus.</p>
+    </div>
+<!-- End Form -->
+<!-- Start Right Column -->
+    <div id="rightClip" class="mobile-remove">
+        <!-- Start Widgets -->
+        <div id="widgets" style="left:40px">
+            <div class="" style="display: block;">
+                <img src="/web/bundles/login/img/general.png" style="">
+                <p class="mpf widget-text" style=""><h3>Ingresa la clave que se te envió por e-mail.</h3></p>
+            </div>
+            <div class="" style="display: block;">
+                <img src="/web/bundles/login/img/general.png" style="">
+                <p class="mpf widget-text" style=""><h3>Elije una nueva contraseña.</h3></p>
+            </div>
+            <div class="" style="display: block;">
+        		<form method=GET action="{{ path('portal') }}">
+                   <input type="submit" id="entrar" name="id" id="sub-a" class="button blue sub-btn" value="Ingreso">
+                </form>
+            </div>
+        </div>
+<!-- End Widgets -->
+    </div>
+<!-- End Right Column -->
+<!-- End Content -->   
+    <div id="footer" class="" style="">
+        <hr><hr>
+        <div id="phone-call"><span class="tblue">
+            <img src="/web/bundles/login/img/BannerT.jpg">
+        </div>
+        <hr>
 {% endblock %}

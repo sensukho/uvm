@@ -12,22 +12,21 @@
 <!-- Content -->
 <!-- Start Form -->
     <div id="cform" class="card move-form" style="">
+    <p class="mpf widget-text"><h2>Ingreso:</h2></p>
 	<form id="register" method=GET action="{{ path('portal_register') }}">
 	    <p style="text-align:justify;">Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>:</p>
         <input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Registro">
 	</form>
         {% if msg %}
-            <br />
             <center><p class="mpf widget-text" style="background-color:brown;color:white">{{ msg }}</p></center>
-            <hr><hr>
         {% endif %}
         <form id="inquiry" class="input-glow" method=POST action="{{ path('portal') }}">
             <br />
             <ul class="mpf">
-                <label for="conName">Usuario</label><input type="text" id="conName" name="username" value="{{ user }}" required/>
+                <label for="conName">Usuario:</label><input type="text" id="conName" name="username" value="{{ user }}" required/>
             </ul>
             <ul class="mpf">
-                <label for="conPass">Contraseña</label><input type="password" id="conEmail" name="password" value="{{ pass }}" required/>
+                <label for="conPass">Contraseña:</label><input type="password" id="conEmail" name="password" value="{{ pass }}" required/>
             </ul>
             <ul class="mpf">
                 <input type="checkbox" id="conCheck" name="chk_rec" value="chk_rec" {{ chk }} ><input type="hidden" name="params" value="{{ params }}"><label for="conCheck">Recordar usuario y contrase&ntilde;a</label>
@@ -36,9 +35,9 @@
                 <label>&nbsp;</label><input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Ingresar">
                 <label style="text-align:right;"><a href="{{ path('portal_reset_pass') }}">¿Olvidaste tu contraseña?</a></label>
             </ul>
-		<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-	    <p style="text-align:justify;">Si tienes problemas para registrarte o para navegar por favor acude al Centro de Cómputo de tu campus.</p>
         </form>
+        <p>&nbsp;</p>
+        <p style="text-align:justify;">Si tienes problemas para ingresar o para navegar por favor acude al Centro de Cómputo de tu campus.</p>
     </div>
 <!-- End Form -->
 <!-- Start Right Column -->
@@ -53,9 +52,9 @@
                 <p class="mpf widget-text" style=""><h2>Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>:</h2></p>
             </div>
             <div class="" style="display: block;">
-		<form method=GET action="{{ path('portal_register') }}">
-	                <input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Registro">
-		</form>
+    		<form method=GET action="{{ path('portal_register') }}">
+    	       <input type="submit" id="entrar" name="id" id="sub-a" class="button blue sub-btn" value="Registro">
+    		</form>
             </div>
         </div>
 <!-- End Widgets -->
