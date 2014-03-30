@@ -1790,5 +1790,66 @@
             "pagination",
             "paginator"
         ]
+    },
+    {
+        "name": "apy/datagrid-bundle",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "target-dir": "APY/DataGridBundle",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Abhoryo/APYDataGridBundle.git",
+            "reference": "c215f7be42ea45a7403e037c4a6240ae0a058c8b"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Abhoryo/APYDataGridBundle/zipball/c215f7be42ea45a7403e037c4a6240ae0a058c8b",
+            "reference": "c215f7be42ea45a7403e037c4a6240ae0a058c8b",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.2",
+            "symfony/symfony": ">=2.0.0",
+            "twig/twig": ">=1.5.0"
+        },
+        "suggest": {
+            "PHPExcel": "Export the grid (Excel, HTML or PDF)",
+            "ext-intl": "Translate the grid",
+            "ext-mbstring": "Convert your data with the right charset"
+        },
+        "time": "2014-03-29 11:56:46",
+        "type": "symfony-bundle",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.1-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "APY\\DataGridBundle": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "authors": [
+            {
+                "name": "Stanislav Turza",
+                "email": "stanislav.turza@gmail.com"
+            },
+            {
+                "name": "Evan Owens",
+                "email": "eaowens@gmail.com"
+            },
+            {
+                "name": "Yoann Petit",
+                "email": "abhoryo@free.fr"
+            }
+        ],
+        "description": "Symfony2 Datagrid Bundle",
+        "homepage": "https://github.com/Abhoryo/APYDataGridBundle",
+        "keywords": [
+            "datagrid",
+            "symfony"
+        ]
     }
 ]

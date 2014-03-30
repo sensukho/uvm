@@ -5,6 +5,8 @@ namespace Core\AdminBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections;
+use APY\DataGridBundle\Grid\Column;
+use APY\DataGridBundle\Grid\Source\Vector;
 use Core\AdminBundle\Entity\Users;
 use Core\AdminBundle\Entity\radcheck;
 use Core\AdminBundle\Entity\ssidmacauth;
@@ -352,12 +354,43 @@ class UsersController extends Controller
         foreach ($usuarios as $usuario => $value) {
             $dql = "SELECT a.macaddress FROM CoreAdminBundle:ssidmacauth a WHERE a.username='".$value['username']."'";
             $query = $em->createQuery($dql);
-            $usuarios[$usuario]['value'] = $query->getResult();
+            $macaddress = $query->getResult();
+            if($macaddress){
+                $i = 1;
+                foreach ($macaddress as $mac) {
+                    $usuarios[$usuario]['macaddress'.$i] = $mac["macaddress"];
+                    $i++;
+                }
+            }else{
+                $usuarios[$usuario]['macaddress1'] = '';
+                $usuarios[$usuario]['macaddress2'] = '';
+            }
+            unset($usuarios[$usuario]['value']);
         }
+
+        //var_dump($usuarios);
 
         $mensaje = '';
 
-        return $this->render('CoreAdminBundle:users:listreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
+        $columns = array(
+            new Column\NumberColumn(array('id' => 'id', 'field' => 'id', 'visible' => false, 'filterable' => false, 'source' => true, 'primary' => true, 'title' => 'id')),
+            new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
+            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
+            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
+            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '50', 'field' => 'campus', 'source' => true, 'title' => 'Campus')),
+            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '50', 'field' => 'tipo', 'source' => true, 'title' => 'Tipo')),
+            new Column\TextColumn(array('id' => 'macaddress1', 'filterable' => false, 'field' => 'macaddress1', 'source' => true, 'title' => 'Macaddress1')),
+            new Column\TextColumn(array('id' => 'macaddress2', 'filterable' => false, 'field' => 'macaddress2', 'source' => true, 'title' => 'Macaddress2')),
+        );
+
+        $source = new Vector($usuarios,$columns);
+        $grid = $this->get('grid');
+        $grid->setSource($source);
+        $grid->setLimits(2);
+
+        return $grid->getGridResponse('CoreAdminBundle:users:listreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
+
+        //return $this->render('CoreAdminBundle:users:listreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
     }
     /***************************************************************************/
     public function listunregAction($session,$q,$offset)
