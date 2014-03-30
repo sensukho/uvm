@@ -33,5 +33,6 @@ return array(
     'Doctrine\\Common\\' => array($vendorDir . '/doctrine/common/lib'),
     'Doctrine\\Bundle\\DoctrineBundle' => array($vendorDir . '/doctrine/doctrine-bundle'),
     'Assetic' => array($vendorDir . '/kriswallsmith/assetic/src'),
+    'APY\\DataGridBundle' => array($vendorDir . '/apy/datagrid-bundle'),
     '' => array($baseDir . '/src'),
 );
