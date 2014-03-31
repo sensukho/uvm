@@ -4,6 +4,8 @@ namespace Core\AdminBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use APY\DataGridBundle\Grid\Column;
+use APY\DataGridBundle\Grid\Source\Vector;
 use Core\AdminBundle\Entity\radcheck;
 use Core\AdminBundle\Entity\Users;
 
@@ -32,14 +34,13 @@ class ReportsController extends Controller
         }
 
         $query = $em->createQuery(
-            "SELECT r.username,r.id,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
+            "SELECT u.id,r.username,u.matricula,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
             FROM CoreAdminBundle:radacct r,CoreAdminBundle:Users u
             WHERE r.acctstoptime = '0000-00-00 00:00:00'  AND r.username = u.username ".$where_campus."
             GROUP BY r.username
             ORDER BY r.username ASC"
         );
 
-        //var_dump($query);
 
         $usuarios = $query->getResult();
 
@@ -53,7 +54,29 @@ class ReportsController extends Controller
             $i++;
         }
 
-        return $this->render('CoreAdminBundle:reports:active.html.twig', array( 'session' => $session, 'session_id' => $session, 'usuarios' => $usuarios, 'campus' => $campus ));
+        $columns = array(
+            new Column\NumberColumn(array('id' => 'id', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'id', 'source' => true, 'align' => 'center', 'title' => 'ID')),
+            new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
+            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
+            new Column\TextColumn(array('id' => 'framedipaddress', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'framedipaddress', 'source' => true, 'align' => 'center', 'title' => 'IP')),
+            new Column\TextColumn(array('id' => 'calledstationid', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'calledstationid', 'source' => true, 'align' => 'center', 'title' => 'SSID')),
+            new Column\NumberColumn(array('id' => 'acctinputoctets', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctinputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Recibidos')),
+            new Column\NumberColumn(array('id' => 'acctoutputoctets', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctoutputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Enviados')),
+            new Column\TextColumn(array('id' => 'acctsessiontime', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctsessiontime', 'source' => true, 'align' => 'center', 'title' => 'T. Activo')),
+            new Column\NumberColumn(array('id' => 1,'visible' => false)),
+            new Column\NumberColumn(array('id' => 2,'visible' => false)),
+            new Column\NumberColumn(array('id' => 3,'visible' => false)),
+        );
+
+        $source = new Vector($usuarios,$columns);
+        $grid = $this->get('grid');
+        $grid->setSource($source);
+
+        $grid->setLimits(50);
+
+        return $grid->getGridResponse('CoreAdminBundle:reports:active.html.twig', array( 'session' => $session, 'session_id' => $session, 'usuarios' => $usuarios, 'campus' => $campus ));
+
+        //return $this->render('CoreAdminBundle:reports:active.html.twig', array( 'session' => $session, 'session_id' => $session, 'usuarios' => $usuarios, 'campus' => $campus ));
     }
     /***************************************************************************/
     public function historyAction($session)

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections;
 use APY\DataGridBundle\Grid\Column;
 use APY\DataGridBundle\Grid\Source\Vector;
+use APY\DataGridBundle\Grid\Action\RowAction;
 use Core\AdminBundle\Entity\Users;
 use Core\AdminBundle\Entity\radcheck;
 use Core\AdminBundle\Entity\ssidmacauth;
@@ -124,7 +125,7 @@ class UsersController extends Controller
         return $this->render('CoreAdminBundle:users:new.html.twig', array( 'session' => $session, 'session_id' => $session, 'form' => $form->createView(), 'msg' => $msg, 'campus' => $campus ));
     }
     /***************************************************************************/
-    public function editAction($session,$id,$usr)
+    public function editAction($session,$id,$username)
     {
         $sesssion = $this->getRequest()->getSession();
         $campus = $sesssion->get('session_admin');
@@ -137,7 +138,7 @@ class UsersController extends Controller
         $em = $this->getDoctrine()->getManager();
         $usuario = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
             array(
-                'username'  => $usr
+                'username'  => $username
             )
         );
 
@@ -148,12 +149,12 @@ class UsersController extends Controller
             $usuario = $em->getRepository('CoreAdminBundle:radcheck')->find($id);
             $usuario1 = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
                 array(
-                    'username'  => $usr
+                    'username'  => $username
                 )
             );
             $usuario2 = $em->getRepository('CoreAdminBundle:ssidmacauth')->findOneBy(
                 array(
-                    'username'  => $usr,
+                    'username'  => $username,
                 )
             );
             if($usuario && $usuario1){
@@ -203,7 +204,7 @@ class UsersController extends Controller
                 $user_form->setNewpass( $usuario->getNewpass() );
 
                 $form = $this->createFormBuilder($user_form)
-                    ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'usr' => $data['form']['username'] )) )
+                    ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $data['form']['username'] )) )
                     ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
                     ->add('secondname', 'text', array('label' => 'Apellidos (paterno y materno separados por un espacio)','attr' => array('placeholder' => 'Apellidos')))
                     ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'Matricula')))
@@ -229,7 +230,7 @@ class UsersController extends Controller
                 case "all":
 
                     $form = $this->createFormBuilder($user_form)
-                        ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'usr' => $usr )) )
+                        ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $username )) )
                         ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
                         ->add('secondname', 'text', array('label' => 'Apellidos (paterno y materno separados por un espacio)','attr' => array('placeholder' => 'Apellidos')))
                         ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'Matricula')))
@@ -243,7 +244,7 @@ class UsersController extends Controller
                     break;
                 case $campus:
                     $form = $this->createFormBuilder($user_form)
-                        ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'usr' => $usr )) )
+                        ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $username )) )
                         ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
                         ->add('secondname', 'text', array('label' => 'Apellidos (paterno y materno separados por un espacio)','attr' => array('placeholder' => 'Apellidos')))
                         ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'Matricula')))
@@ -337,7 +338,7 @@ class UsersController extends Controller
             "SELECT COUNT(r.id),r.username,r.value,u.firstname,u.secondname,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname"
         );
 
-        //echo "SELECT COUNT(r.id),r.username,r.value,u.firstname,u.secondname,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname";
+        //echo "SELECT COUNT(r.id),r.username,r.value,u.firstname,u.secondname,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname"
 
         $num_usuarios = $num_usuarios->getResult();
         $users_total = $num_usuarios[0][1];
@@ -345,10 +346,11 @@ class UsersController extends Controller
         $total_pages = round($users_total/$items_per_page,0);
 
         $usuarios = $em->createQuery(
-            "SELECT r.id,r.username,r.value,u.firstname,u.secondname,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname"
+            "SELECT r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname"
         );
-        $usuarios->setMaxResults($items_per_page);
-        $usuarios->setFirstResult(($offset-1)*$items_per_page);
+        //echo "SELECT r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname";
+        //$usuarios->setMaxResults($items_per_page);
+        //$usuarios->setFirstResult(($offset-1)*$items_per_page);
         $usuarios = $usuarios->getResult();
         
         foreach ($usuarios as $usuario => $value) {
@@ -365,28 +367,36 @@ class UsersController extends Controller
                 $usuarios[$usuario]['macaddress1'] = '';
                 $usuarios[$usuario]['macaddress2'] = '';
             }
-            unset($usuarios[$usuario]['value']);
+            //unset($usuarios[$usuario]['value']);
         }
-
-        //var_dump($usuarios);
 
         $mensaje = '';
 
         $columns = array(
             new Column\NumberColumn(array('id' => 'id', 'field' => 'id', 'visible' => false, 'filterable' => false, 'source' => true, 'primary' => true, 'title' => 'id')),
-            new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
-            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
-            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
-            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '50', 'field' => 'campus', 'source' => true, 'title' => 'Campus')),
-            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '50', 'field' => 'tipo', 'source' => true, 'title' => 'Tipo')),
-            new Column\TextColumn(array('id' => 'macaddress1', 'filterable' => false, 'field' => 'macaddress1', 'source' => true, 'title' => 'Macaddress1')),
-            new Column\TextColumn(array('id' => 'macaddress2', 'filterable' => false, 'field' => 'macaddress2', 'source' => true, 'title' => 'Macaddress2')),
+            new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
+            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
+            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
+            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
+            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
+            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
+            new Column\TextColumn(array('id' => 'macaddress1', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'macaddress1', 'source' => true, 'align' => 'center', 'title' => 'Macaddress1')),
+            new Column\TextColumn(array('id' => 'macaddress2', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'macaddress2', 'source' => true, 'align' => 'center', 'title' => 'Macaddress2')),
         );
 
         $source = new Vector($usuarios,$columns);
         $grid = $this->get('grid');
         $grid->setSource($source);
-        $grid->setLimits(2);
+
+        $myRowAction = new RowAction('Editar', 'admin_usuarios_modificar', false, '_self');
+        $myRowAction->setRouteParameters(array('session' => $session, 'id', 'username' ));
+        $grid->addRowAction($myRowAction);
+
+        $myRowAction1 = new RowAction('Eliminar', 'admin_usuarios_eliminar', false, '_self');
+        $myRowAction1->setRouteParameters(array('session' => $session, 'id' ));
+        $grid->addRowAction($myRowAction1);
+
+        $grid->setLimits(50);
 
         return $grid->getGridResponse('CoreAdminBundle:users:listreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
 
@@ -424,7 +434,7 @@ class UsersController extends Controller
             $where_search = " ( u.firstname LIKE '%".$q."%' OR u.secondname LIKE '%".$q."%' OR u.matricula LIKE '%".$q."%' ) AND ";
         }
         $num_usuarios = $em->createQuery(
-            "SELECT COUNT(u.id),u.username,u.firstname,u.secondname,u.campus,u.tipo,u.matricula,u.fecha FROM CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." u.username != '' AND u.username = '---' ORDER BY u.firstname,u.secondname"
+            "SELECT COUNT(u.id),u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." u.username != '' AND u.username = '---' ORDER BY u.firstname,u.secondname"
         );
 
         //echo "SELECT COUNT(u.id),u.username,u.firstname,u.secondname,u.campus,u.tipo,u.matricula,u.fecha FROM CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." u.username != '' AND u.username = '---' ORDER BY u.firstname,u.secondname";
@@ -435,15 +445,32 @@ class UsersController extends Controller
         $total_pages = round($users_total/$items_per_page,0);
 
         $usuarios = $em->createQuery(
-            "SELECT u.id,u.username,u.firstname,u.secondname,u.campus,u.tipo,u.matricula,u.fecha FROM CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." u.username != '' AND u.username = '---' ORDER BY u.firstname,u.secondname"
+            "SELECT u.id,u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." u.username != '' AND u.username = '---' ORDER BY u.firstname,u.secondname"
         );
-        $usuarios->setMaxResults($items_per_page);
-        $usuarios->setFirstResult(($offset-1)*$items_per_page);
+        //$usuarios->setMaxResults($items_per_page);
+        //$usuarios->setFirstResult(($offset-1)*$items_per_page);
         $usuarios = $usuarios->getResult();
 
         $mensaje = '';
 
-        return $this->render('CoreAdminBundle:users:listunreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
+        $columns = array(
+            new Column\NumberColumn(array('id' => 'id', 'field' => 'id', 'visible' => false, 'filterable' => false, 'source' => true, 'primary' => true, 'title' => 'id')),
+            //new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
+            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
+            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
+            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
+            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '50', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
+            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '50', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
+        );
+
+        $source = new Vector($usuarios,$columns);
+        $grid = $this->get('grid');
+        $grid->setSource($source);
+        $grid->setLimits(50);
+
+        return $grid->getGridResponse('CoreAdminBundle:users:listunreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
+
+        //return $this->render('CoreAdminBundle:users:listunreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
     }
     /***************************************************************************/
     public function resetmacsAction()
