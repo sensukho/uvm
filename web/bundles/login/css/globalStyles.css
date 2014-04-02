@@ -4,12 +4,6 @@
 * Document rules *
 *****************/
 
-html {
-    background: url(../img/bg/linen-medium.png) repeat;
-    -webkit-font-smoothing: subpixel-antialiased;
-    text-shadow:rgba(0,0,0,0.01) 0 0 0;
-}
-
 html, body {
     height: 100%; width: 100%;
     top: 0; left: 0; right: 0; bottom: 0;
