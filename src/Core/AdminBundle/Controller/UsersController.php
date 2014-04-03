@@ -39,7 +39,6 @@ class UsersController extends Controller
                 ->add('newpass', 'hidden', array('attr' => array('value' => '0')))
                 ->add('newpasssecond', 'hidden', array('attr' => array('value' => '0')))
                 ->add('email', 'hidden', array('attr' => array('value' => '0')))
-		->add('fecha', 'hidden', array('attr' => array('value' => '2012-12-12')))
                 ->add('enviar', 'submit')
             ->getForm();
             break;
@@ -59,7 +58,6 @@ class UsersController extends Controller
                 ->add('newpass', 'hidden', array('attr' => array('value' => '0')))
                 ->add('newpasssecond', 'hidden', array('attr' => array('value' => '0')))
                 ->add('email', 'hidden', array('attr' => array('value' => '0')))
-		->add('fecha', 'hidden', array('attr' => array('value' => '2012-12-12')))
                 ->add('enviar', 'submit')
             ->getForm();
             break;
@@ -78,7 +76,6 @@ class UsersController extends Controller
                 ->add('newpass', 'hidden', array('attr' => array('value' => '0')))
                 ->add('newpasssecond', 'hidden', array('attr' => array('value' => '0')))
                 ->add('email', 'hidden', array('attr' => array('value' => '0')))
-		->add('fecha', 'hidden', array('attr' => array('value' => '2012-12-12')))
                 ->add('enviar', 'submit')
             ->getForm();
             break;
