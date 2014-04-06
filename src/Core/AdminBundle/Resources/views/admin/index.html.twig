@@ -2,38 +2,36 @@
 <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
 <!--[if IE 7]> <html class="lt-ie9 lt-ie8" lang="en"> <![endif]-->
 <!--[if IE 8]> <html class="lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html lang="en"> <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>UVM ::: LogIn</title>
-  <link rel="stylesheet" href="{{ asset('/web/bundles/admin/login/css/style.css') }}">
-</head>
-<body>
-  <div style="text-align:center; margin:50px;"><img src="{{ asset('/web/bundles/admin/login/img/logo.jpg') }}" height="75px"></div>
-  <form method="POST" action="{{ path('admin_login') }}" class="login">
-    <p>
-      <label for="login">Usuario:</label>
-      <input type="text" name="user" id="login" required="required" value="">
-    </p>
-
-    <p>
-      <label for="password">Password:</label>
-      <input type="password" name="pass" id="password" required="required" value="">
-    </p>
-
-    <p class="login-submit">
-      <button type="submit" class="login-button">Login</button>
-    </p>
-  </form>
-
-{% if msg %}
+<!--[if gt IE 8]><!-->
+<html lang="en"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>UVM ::: LogIn</title>
+    <link rel="stylesheet" href="{{ asset('/web/bundles/admin/login/css/style.css') }}">
+  </head>
+  <body>
+    <div style="text-align:center; margin:50px;"><img src="{{ asset('/web/bundles/admin/login/img/logo.jpg') }}" height="75px"></div>
+    <form method="POST" action="{{ path('admin_login') }}" class="login">
+      <p>
+        <label for="login">Usuario:</label>
+        <input type="text" name="user" id="login" required="required" value="">
+      </p>
+      <p>
+        <label for="password">Password:</label>
+        <input type="password" name="pass" id="password" required="required" value="">
+      </p>
+      <p class="login-submit">
+        <button type="submit" class="login-button">Login</button>
+      </p>
+    </form>
+    {% if msg %}
     <div style="font-size:18px;color:white;text-align:center;background-color:brown;">{{ msg }}</div>
-{% endif %}
-
-  <section class="about">
-    <p class="about-author">
-      &copy; 2014 UVM Micro-sitio
-  </section>
-</body>
+    {% endif %}
+    <section class="about">
+      <p class="about-author">
+        &copy; 2014 UVM Micro-sitio
+      </p>
+    </section>
+  </body>
 </html>

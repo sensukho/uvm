@@ -1,0 +1,70 @@
+Core\AdminBundle\Entity\Users:
+    type: entity
+    table: Users
+    fields:
+        id:
+            id: true
+            type: integer
+            unsigned: false
+            nullable: false
+            generator:
+                strategy: IDENTITY
+        username:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+        genpass:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+        newpass:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+        fecha:
+            type: date
+            nullable: false
+        email:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+        firstname:
+            type: string
+            length: 64
+            fixed: false
+            nullable: false
+        secondname:
+            type: string
+            length: 64
+            fixed: false
+            nullable: false
+        matricula:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+        newpasssecond:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+        campus:
+            type: string
+            length: 255
+            fixed: false
+            nullable: true
+        tipo:
+            type: string
+            length: 255
+            fixed: false
+            nullable: true
+        ssid:
+            type: string
+            length: 100
+            fixed: false
+            nullable: false
+    lifecycleCallbacks: {  }

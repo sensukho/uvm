@@ -6,102 +6,71 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Users
- *
- * @ORM\Table()
- * @ORM\Entity(repositoryClass="Core\AdminBundle\Entity\UsersRepository")
  */
 class Users
 {
     /**
      * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="firstname", type="string", length=64)
      */
     private $firstname;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="secondname", type="string", length=64)
      */
     private $secondname;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="username", type="string", length=255)
      */
     private $username;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="matricula", type="string", length=255)
      */
     private $matricula;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="genpass", type="string", length=255)
      */
     private $genpass;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="newpass", type="string", length=255)
      */
     private $newpass;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="newpasssecond", type="string", length=255)
      */
     private $newpasssecond;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="fecha", type="date")
      */
     private $fecha;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=255)
      */
     private $email;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="campus", type="string", length=255)
      */
     private $campus;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="tipo", type="string", length=255)
      */
     private $tipo;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="ssid", type="string", length=100)
      */
     private $ssid;
 
@@ -120,7 +89,7 @@ class Users
      * Set firstname
      *
      * @param string $firstname
-     * @return radcheck
+     * @return Users
      */
     public function setFirstname($firstname)
     {
@@ -143,7 +112,7 @@ class Users
      * Set secondname
      *
      * @param string $secondname
-     * @return radcheck
+     * @return Users
      */
     public function setSecondname($secondname)
     {
@@ -327,7 +296,7 @@ class Users
      * Set campus
      *
      * @param string $campus
-     * @return radcheck
+     * @return Users
      */
     public function setCampus($campus)
     {
@@ -350,7 +319,7 @@ class Users
      * Set tipo
      *
      * @param string $tipo
-     * @return radcheck
+     * @return Users
      */
     public function setTipo($tipo)
     {
@@ -373,7 +342,7 @@ class Users
      * Set ssid
      *
      * @param string $ssid
-     * @return radcheck
+     * @return Users
      */
     public function setSsid($ssid)
     {

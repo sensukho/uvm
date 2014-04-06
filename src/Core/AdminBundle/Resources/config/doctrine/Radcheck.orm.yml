@@ -1,6 +1,6 @@
-Core\AdminBundle\Entity\Campus:
+Core\AdminBundle\Entity\Radcheck:
     type: entity
-    table: Campus
+    table: radcheck
     fields:
         id:
             id: true
@@ -9,28 +9,24 @@ Core\AdminBundle\Entity\Campus:
             nullable: false
             generator:
                 strategy: IDENTITY
-        nombre:
+        username:
             type: string
-            length: 25
+            length: 64
             fixed: false
             nullable: false
-        usuario:
+        attribute:
             type: string
-            length: 25
+            length: 64
             fixed: false
             nullable: false
-        clave:
+        op:
             type: string
-            length: 55
+            length: 2
             fixed: false
             nullable: false
-        nom:
+        value:
             type: string
-            length: 5
+            length: 255
             fixed: false
-            nullable: false
-        activo:
-            type: integer
-            unsigned: false
             nullable: false
     lifecycleCallbacks: {  }

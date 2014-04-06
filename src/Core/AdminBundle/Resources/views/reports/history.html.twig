@@ -1,16 +1,13 @@
 {% extends 'CoreAdminBundle:admin:layout.html.twig' %}
 {% block content %}
 
-    {{ include('CoreAdminBundle:users:style-grid.html.twig') }}
+    {{ include('CoreAdminBundle:reports:style-grid.html.twig') }}
 
     <div>
-
-        <div>
-            <h1>Usuarios :: Historial</h1>
+        <div id="title">
+            <h1>Usuarios :: Registrados</h1>
         </div>
-
         {{ grid(grid) }}
-
     </div>
 
 {% endblock %}

@@ -1,12 +1,8 @@
 <!DOCTYPE HTML>
-<!--
-	Striped 2.5 by HTML5 Up!
-	html5up.net | @n33co
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
+{% if app.session.get('session_id') %}
 <html>
 	<head>
-		<title>UVM :: Administrator</title>
+		<title>UVM :: Administrator :: {{ app.session.get('admin_nombre') }}</title>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
@@ -30,46 +26,40 @@
 		Set it to "right-sidebar" to, you guessed it, position it on the right.
 	-->
 	<body class="left-sidebar">
-{% if session_id == session %}
 		<!-- Wrapper -->
 			<div id="wrapper">
-
 				<!-- Content -->
 					<div id="content">
 						<div id="content-inner">
-					
 							<!-- Post -->
 								<article class="is-post is-post-excerpt">
 									{% block content %}{% endblock %}
 								</article>
 						</div>
 					</div>
-
 				<!-- Sidebar -->
 					<div id="sidebar">
-					
 						<!-- Logo -->
 							<div id="logo">
-							{% if campus == 'all' %}
+							{% if app.session.get('admin_nom') == 'UVM' %}
 								<h1>UVM</h1>
 							{% else %}
-								<h1>UVM<br />{{campus}}</h1>
+								<h1>UVM<br />{{ app.session.get('admin_nombre') }}</h1>
 							{% endif %}
 							</div>
-					
 						<!-- Nav -->
 							<nav id="nav">
 								<ul>
-									<li class="current_page_item"><a href="{{ path('admin_usuarios_crear', {session: session_id}) }}">Crear usuario</a></li>
+									<li class="current_page_item"><a href="{{ path('admin_usuarios_crear', {session: app.session.get('session_id')}) }}">Crear usuario</a></li>
 								</ul>
 							</nav>
 							<nav id="nav">
 								<ul>
 									<li class="current_page_item">Reportes</li>
-									<li><a href="{{ path('admin_usuarios_listar_unreg', {session: session_id, q: 0, offset: 1}) }}">Usuarios Pendientes</a></li>
-									<li><a href="{{ path('admin_usuarios_listar_reg', {session: session_id, q: 0, offset: 1}) }}">Usuarios Registrados</a></li>
-									<li><a href="{{ path('admin_reportes_activos', {session: session_id}) }}">Usuarios Activos</a></li>
-									<li><a href="{{ path('admin_reportes_historial', {session: session_id}) }}">Historial</a></li>
+									<li><a href="{{ path('admin_reportes_listar_unreg', {session: app.session.get('session_id')}) }}">Usuarios Pendientes</a></li>
+									<li><a href="{{ path('admin_reportes_listar_reg', {session: app.session.get('session_id')}) }}">Usuarios Registrados</a></li>
+									<li><a href="{{ path('admin_reportes_activos', {session: app.session.get('session_id')}) }}">Usuarios Activos</a></li>
+									<li><a href="{{ path('admin_reportes_historial', {session: app.session.get('session_id')}) }}">Historial</a></li>
 								</ul>
 							</nav>
 							<nav id="nav">
@@ -77,17 +67,51 @@
 									<li class="current_page_item"><a href="{{ path('admin') }}">Salir</a></li>
 								</ul>
 							</nav>
-
 						<!-- Copyright -->
 							<div id="copyright">
 								<p>
 									&copy; 2014
 								</p>
 							</div>
-
 					</div>
-
 			</div>
-{% endif %}
 	</body>
 </html>
+{% else %}
+<!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]> <html class="lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]> <html class="lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>UVM ::: LogIn</title>
+		<link rel="stylesheet" href="{{ asset('/web/bundles/admin/login/css/style.css') }}">
+	</head>
+	<body>
+		<div style="text-align:center; margin:50px;"><img src="{{ asset('/web/bundles/admin/login/img/logo.jpg') }}" height="75px"></div>
+		<form method="POST" action="{{ path('admin_login') }}" class="login">
+			<p>
+				<label for="login">Usuario:</label>
+				<input type="text" name="user" id="login" required="required" value="">
+			</p>
+			<p>
+				<label for="password">Password:</label>
+				<input type="password" name="pass" id="password" required="required" value="">
+			</p>
+			<p class="login-submit">
+				<button type="submit" class="login-button">Login</button>
+			</p>
+		</form>
+		{% if msg %}
+		<div style="font-size:18px;color:white;text-align:center;background-color:brown;">{{ msg }}</div>
+		{% endif %}
+		<section class="about">
+			<p class="about-author">
+				&copy; 2014 UVM Micro-sitio
+			</p>
+		</section>
+	</body>
+</html>
+{% endif %}

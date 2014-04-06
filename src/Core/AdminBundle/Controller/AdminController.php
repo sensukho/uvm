@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\Session;
+
 use Core\AdminBundle\Entity\Campus;
 
 class AdminController extends Controller
@@ -64,7 +65,7 @@ class AdminController extends Controller
         $session_id = base64_encode( md5( $nombre.$nom.date('Y-n-d') ) );
 
         if ($session_id === $session ) {
-            return $this->render('CoreAdminBundle:admin:lpg.html.twig', array( 'session' => $session, 'session_id' => $session_id, 'campus' => $campus ));
+            return $this->render('CoreAdminBundle:admin:lpg.html.twig', array());
         }else{
             return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión ha caducado, ingrese de nuevo por favor.' ));
         }

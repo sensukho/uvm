@@ -1,36 +1,28 @@
-Core\AdminBundle\Entity\Campus:
+Core\AdminBundle\Entity\Ssidmacauth:
     type: entity
-    table: Campus
+    table: ssidmacauth
     fields:
         id:
             id: true
             type: integer
             unsigned: false
             nullable: false
+            column: ID
             generator:
                 strategy: IDENTITY
-        nombre:
+        username:
             type: string
-            length: 25
+            length: 20
             fixed: false
             nullable: false
-        usuario:
+        macaddress:
             type: string
-            length: 25
+            length: 20
             fixed: false
             nullable: false
-        clave:
+        ssid:
             type: string
-            length: 55
+            length: 100
             fixed: false
-            nullable: false
-        nom:
-            type: string
-            length: 5
-            fixed: false
-            nullable: false
-        activo:
-            type: integer
-            unsigned: false
             nullable: false
     lifecycleCallbacks: {  }

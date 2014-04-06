@@ -1,0 +1,128 @@
+Core\AdminBundle\Entity\Radacct:
+    type: entity
+    table: radacct
+    fields:
+        id:
+            id: true
+            type: integer
+            unsigned: false
+            nullable: false
+            generator:
+                strategy: IDENTITY
+        acctsessionid:
+            type: string
+            length: 64
+            fixed: false
+            nullable: false
+        acctuniqueid:
+            type: string
+            length: 32
+            fixed: false
+            nullable: false
+        username:
+            type: string
+            length: 64
+            fixed: false
+            nullable: false
+        groupname:
+            type: string
+            length: 64
+            fixed: false
+            nullable: false
+        realm:
+            type: string
+            length: 64
+            fixed: false
+            nullable: false
+        nasipaddress:
+            type: string
+            length: 15
+            fixed: false
+            nullable: false
+        nasportid:
+            type: string
+            length: 15
+            fixed: false
+            nullable: false
+        nasporttype:
+            type: string
+            length: 32
+            fixed: false
+            nullable: false
+        acctstarttime:
+            type: datetime
+            nullable: false
+        acctstoptime:
+            type: datetime
+            nullable: true
+        acctsessiontime:
+            type: integer
+            unsigned: false
+            nullable: false
+        acctauthentic:
+            type: string
+            length: 32
+            fixed: false
+            nullable: false
+        connectinfoStart:
+            type: string
+            length: 50
+            fixed: false
+            nullable: false
+            column: connectinfo_start
+        connectinfoStop:
+            type: string
+            length: 50
+            fixed: false
+            nullable: false
+            column: connectinfo_stop
+        acctinputoctets:
+            type: bigint
+            nullable: false
+        acctoutputoctets:
+            type: bigint
+            nullable: false
+        calledstationid:
+            type: string
+            length: 50
+            fixed: false
+            nullable: false
+        callingstationid:
+            type: string
+            length: 50
+            fixed: false
+            nullable: false
+        acctterminatecause:
+            type: string
+            length: 32
+            fixed: false
+            nullable: false
+        servicetype:
+            type: string
+            length: 32
+            fixed: false
+            nullable: false
+        framedprotocol:
+            type: string
+            length: 32
+            fixed: false
+            nullable: false
+        framedipaddress:
+            type: string
+            length: 15
+            fixed: false
+            nullable: false
+        acctstartdelay:
+            type: integer
+            unsigned: false
+            nullable: false
+        acctstopdelay:
+            type: integer
+            unsigned: false
+            nullable: false
+        xascendsessionsvrkey:
+            type: string
+            length: 10
+            fixed: false
+            nullable: false
+    lifecycleCallbacks: {  }

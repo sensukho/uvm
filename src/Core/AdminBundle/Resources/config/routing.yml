@@ -26,19 +26,19 @@ admin_usuarios_eliminar:
     pattern:  /admin/users/del/{session}/{id}/
     defaults: { _controller: CoreAdminBundle:Users:del }
 
-admin_usuarios_listar_reg:
-    pattern:  /admin/users/listreg/{session}/{q}/{offset}/
-    defaults: { _controller: CoreAdminBundle:Users:listreg }
-
-admin_usuarios_listar_unreg:
-    pattern:  /admin/users/listunreg/{session}/{q}/{offset}/
-    defaults: { _controller: CoreAdminBundle:Users:listunreg }
-
 admin_reset_macs:
     pattern:  /admin/users/resetmacs/
     defaults: { _controller: CoreAdminBundle:Users:resetmacs }
 
 ##### ADMINISTRATOR :: REPORTES #####
+
+admin_reportes_listar_reg:
+    pattern:  /admin/reports/listreg/{session}/
+    defaults: { _controller: CoreAdminBundle:Reports:listreg }
+
+admin_reportes_listar_unreg:
+    pattern:  /admin/reports/listunreg/{session}/
+    defaults: { _controller: CoreAdminBundle:Reports:listunreg }
 
 admin_reportes_activos:
     pattern:  /admin/reports/active/{session}/

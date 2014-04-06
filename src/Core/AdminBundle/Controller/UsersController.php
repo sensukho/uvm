@@ -4,25 +4,39 @@ namespace Core\AdminBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Doctrine\Common\Collections;
+
 use APY\DataGridBundle\Grid\Column;
 use APY\DataGridBundle\Grid\Source\Vector;
 use APY\DataGridBundle\Grid\Action\RowAction;
+
 use Core\AdminBundle\Entity\Users;
-use Core\AdminBundle\Entity\radcheck;
-use Core\AdminBundle\Entity\ssidmacauth;
+use Core\AdminBundle\Entity\Radcheck;
+use Core\AdminBundle\Entity\Ssidmacauth;
 use Core\AdminBundle\Entity\Campus;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class UsersController extends Controller
 {
 ########## USERS ##########
     public function newAction(Request $request,$session)
     {
+        /*************************************************/
+        /** START Session
+        /*************************************************/
+        $request = Request::createFromGlobals();
         $sesssion = $this->getRequest()->getSession();
+        $session_id = $sesssion->get('session_id');
         $nombre = $sesssion->get('admin_nombre');
         $nom = $sesssion->get('admin_nom');
         $campus = array();
+        $msg = '';
+        if (!$session_id) {
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión ha caducado, ingrese de nuevo por favor.' ));
+        }
+        /*************************************************/
+        /** END Session
+        /*************************************************/
 
         $em = $this->getDoctrine()->getManager();
 
@@ -55,11 +69,20 @@ class UsersController extends Controller
             ->add('enviar', 'submit')
         ->getForm();
 
-        $msg = '';
-        $formreq = $form;
-
         if ($request->isMethod('POST')) {
+            
             $data = $request->request->all();
+
+            /*************************************************/
+            /** START Validacion
+            /*************************************************/
+            if ($msg = $this->valForm( $data )) {
+                  return $this->render('CoreAdminBundle:users:new.html.twig', array( 'form' => $form->createView(), 'msg' => $msg ));
+              } 
+            /*************************************************/
+            /** END Validacion
+            /*************************************************/
+
             $em = $this->getDoctrine()->getManager();
             $user = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
                 array(
@@ -92,20 +115,44 @@ class UsersController extends Controller
             }
         }
 
-        return $this->render('CoreAdminBundle:users:new.html.twig', array( 'session' => $session, 'session_id' => $session, 'form' => $form->createView(), 'msg' => $msg, 'campus' => $campus ));
+        return $this->render('CoreAdminBundle:users:new.html.twig', array( 'form' => $form->createView(), 'msg' => $msg ));
     }
     /***************************************************************************/
     public function editAction($session,$id,$username)
     {
-        $sesssion = $this->getRequest()->getSession();
-        $campus = $sesssion->get('session_admin');
-
+        /*************************************************/
+        /** START Session
+        /*************************************************/
         $request = Request::createFromGlobals();
-        $user_form = new Users();
-        $form = $this->createFormBuilder($user_form);
+        $sesssion = $this->getRequest()->getSession();
+        $session_id = $sesssion->get('session_id');
+        $nombre = $sesssion->get('admin_nombre');
+        $nom = $sesssion->get('admin_nom');
+        $campus = array();
         $msg = '';
 
+        if (!$session_id) {
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión ha caducado, ingrese de nuevo por favor.' ));
+        }
+        /*************************************************/
+        /** END Session
+        /*************************************************/
+
         $em = $this->getDoctrine()->getManager();
+
+        if ($nom == 'UVM') {
+            $query = $em->createQuery("SELECT c.nom FROM CoreAdminBundle:Campus c WHERE c.nom != 'UVM' ORDER BY c.nom ASC");
+            $result = $query->getResult();
+            foreach ($result as $value) {
+                $campus[$value['nom']] = $value['nom'];
+            }
+        }else{
+            $campus[$nom] = $nom;
+        }
+
+        $user_form = new Users();
+        $form = $this->createFormBuilder($user_form);
+
         $usuario = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
             array(
                 'username'  => $username
@@ -116,13 +163,22 @@ class UsersController extends Controller
 
             $data = $request->request->all();
 
-            $usuario = $em->getRepository('CoreAdminBundle:radcheck')->find($id);
+            /*************************************************/
+            /** START Validacion
+            /*************************************************/
+            if ($msg = $this->valForm( $data )) {
+                  return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $nom ));
+              } 
+            /*************************************************/
+            /** END Validacion
+            /*************************************************/
+            $usuario = $em->getRepository('CoreAdminBundle:Radcheck')->find($id);
             $usuario1 = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
                 array(
                     'username'  => $username
                 )
             );
-            $usuario2 = $em->getRepository('CoreAdminBundle:ssidmacauth')->findOneBy(
+            $usuario2 = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findOneBy(
                 array(
                     'username'  => $username,
                 )
@@ -174,11 +230,11 @@ class UsersController extends Controller
                 $user_form->setNewpass( $usuario->getNewpass() );
 
                 $form = $this->createFormBuilder($user_form)
-                    ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $data['form']['username'] )) )
+                    ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $username )) )
                     ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
                     ->add('secondname', 'text', array('label' => 'Apellidos (paterno y materno separados por un espacio)','attr' => array('placeholder' => 'Apellidos')))
                     ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'Matricula')))
-                    ->add('campus', 'choice', array('label' => 'Campus', 'choices' => array($data['form']['campus'] => $data['form']['campus'],'CHA' => 'CHA','COY' => 'COY','CUM' => 'CUM','GLDSUR' => 'GLDSUR','HER' => 'HER','HIS' => 'HIS','LOM' => 'LOM','SN' => 'NS','PUE' => 'PUE','QRO' => 'QRO','SRA' => 'SRA','TLA' => 'TLA','TOL' => 'TOL','ZAP' => 'ZAP'), 'attr' => array('placeholder' => 'campus')))
+                    ->add('campus', 'choice', array('label' => 'Campus', 'choices' => $campus, 'data' => $usuario->getCampus(), 'attr' => array('placeholder' => 'campus')))
                     ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
                     ->add('email', 'email', array('label' => 'E-mail','attr' => array('placeholder' => 'correo electronico')))
                     ->add('username', 'text', array('label' => 'Usuario (elije un nombre de usuario de por lo menos 5 caracteres)','attr' => array('placeholder' => 'Mínimo de 5 caracteres.')))
@@ -196,37 +252,18 @@ class UsersController extends Controller
             $user_form->setTipo( $usuario->getTipo() );
             $user_form->setNewpass( $usuario->getNewpass() );
 
-            switch ( $campus ) {
-                case "all":
-
-                    $form = $this->createFormBuilder($user_form)
-                        ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $username )) )
-                        ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
-                        ->add('secondname', 'text', array('label' => 'Apellidos (paterno y materno separados por un espacio)','attr' => array('placeholder' => 'Apellidos')))
-                        ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'Matricula')))
-                        ->add('campus', 'choice', array('label' => 'Campus', 'choices' => array('CHA' => 'CHA','COY' => 'COY','CUM' => 'CUM','GLDSUR' => 'GLDSUR','HER' => 'HER','HIS' => 'HIS','LOM' => 'LOM','SN' => 'NS','PUE' => 'PUE','QRO' => 'QRO','SRA' => 'SRA','TLA' => 'TLA','TOL' => 'TOL','ZAP' => 'ZAP'), 'attr' => array('placeholder' => 'campus')))
-                        ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
-                        ->add('email', 'email', array('label' => 'E-mail','attr' => array('placeholder' => 'correo electronico')))
-                        ->add('username', 'text', array('label' => 'Usuario (elije un nombre de usuario de por lo menos 5 caracteres)','attr' => array('placeholder' => 'Mínimo de 5 caracteres.')))
-                        ->add('newpass', 'text', array('label' => 'Password (mínimo 6 caracteres, no se diferencian mayúsculas de minúsculas y utiliza solo caracteres alfanuméricos.)','attr' => array('placeholder' => 'Mínimo de 6 caracteres.', 'pattern' => '.{6,}')))
-                        ->add('enviar', 'submit')
-                    ->getForm();
-                    break;
-                case $campus:
-                    $form = $this->createFormBuilder($user_form)
-                        ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $username )) )
-                        ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
-                        ->add('secondname', 'text', array('label' => 'Apellidos (paterno y materno separados por un espacio)','attr' => array('placeholder' => 'Apellidos')))
-                        ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'Matricula')))
-                        ->add('campus', 'choice', array('label' => 'Campus', 'choices' => array( $usuario->getCampus() => $usuario->getCampus()), 'attr' => array('placeholder' => 'campus')))
-                        ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
-                        ->add('email', 'email', array('label' => 'E-mail','attr' => array('placeholder' => 'correo electronico')))
-                        ->add('username', 'text', array('label' => 'Usuario (elije un nombre de usuario de por lo menos 5 caracteres)','attr' => array('placeholder' => 'Mínimo de 5 caracteres.')))
-                        ->add('newpass', 'text', array('label' => 'Password (mínimo 6 caracteres, no se diferencian mayúsculas de minúsculas y utiliza solo caracteres alfanuméricos.)','attr' => array('placeholder' => 'Mínimo de 6 caracteres.', 'pattern' => '.{6,}')))
-                        ->add('enviar', 'submit')
-                    ->getForm();
-                    break;
-            }
+            $form = $this->createFormBuilder($user_form)
+                ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $username )) )
+                ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
+                ->add('secondname', 'text', array('label' => 'Apellidos (paterno y materno separados por un espacio)','attr' => array('placeholder' => 'Apellidos')))
+                ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'Matricula')))
+                ->add('campus', 'choice', array('label' => 'Campus', 'choices' => $campus, 'data' => $usuario->getCampus(), 'attr' => array('placeholder' => 'campus')))
+                ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
+                ->add('email', 'email', array('label' => 'E-mail','attr' => array('placeholder' => 'correo electronico')))
+                ->add('username', 'text', array('label' => 'Usuario (elije un nombre de usuario de por lo menos 5 caracteres)','attr' => array('placeholder' => 'Mínimo de 5 caracteres.')))
+                ->add('newpass', 'text', array('label' => 'Password (mínimo 6 caracteres, no se diferencian mayúsculas de minúsculas y utiliza solo caracteres alfanuméricos.)','attr' => array('placeholder' => 'Mínimo de 6 caracteres.', 'pattern' => '.{6,}')))
+                ->add('enviar', 'submit')
+            ->getForm();
         }
         return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $campus ));
     }
@@ -241,8 +278,8 @@ class UsersController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        $usuario_radchek = $em->getRepository('CoreAdminBundle:radcheck')->find($id);
-        $usuario_ssidmacauth = $em->getRepository('CoreAdminBundle:ssidmacauth')->findBy(array('username' => $usuario_radchek->getUsername()));
+        $usuario_radchek = $em->getRepository('CoreAdminBundle:Radcheck')->find($id);
+        $usuario_ssidmacauth = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findBy(array('username' => $usuario_radchek->getUsername()));
         $usuario_users = $em->getRepository('CoreAdminBundle:Users')->findOneBy(array('username' => $usuario_radchek->getUsername()));
 
 
@@ -265,185 +302,13 @@ class UsersController extends Controller
 
 
             $mensaje = 'Usuario eliminado con éxito !';
-            $usuarios = $em->getRepository('CoreAdminBundle:radcheck')->findAll();
+            $usuarios = $em->getRepository('CoreAdminBundle:Radcheck')->findAll();
             return $this->redirect( $this->generateUrl('admin_usuarios_listar_reg', array( 'session' => $session, 'offset' => '1', 'session_id' => $session, 'msg' => $mensaje, 'usuarios' => $usuarios, 'q' => '0' )) );
         }else{
-            $mensaje = '¿Seguro que desea eliminar al usuario?';
+            $mensaje = "¿Seguro que desea eliminar al usuario '".$usuario_radchek->getUsername()."' ?";
         }
 
         return $this->render('CoreAdminBundle:users:del.html.twig', array( 'session' => $session, 'session_id' => $session, 'msg' => $mensaje, 'usuario' => $usuario_radchek, 'campus' => $campus ));
-    }
-    /***************************************************************************/
-    public function listregAction($session,$q,$offset)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $request = Request::createFromGlobals();
-        if ($request->isMethod('POST')) {
-            $q = $request->request->get('q',NULL);
-        }
-        $where_search = '';
-
-        $sesssion = $this->getRequest()->getSession();
-        $campus = $sesssion->get('session_admin');
-
-        switch ( $campus ) {
-            case "all":
-                $where_campus = "";
-            break;
-
-            case $campus:
-                $where_campus = " u.campus = '".$campus."' AND ";
-            break;
-
-            default:
-                $where_campus = "";
-            break;
-        }
-
-        if ($q != NULL && $q != '0') {
-            $where_search = " ( u.username LIKE '%".$q."%' OR u.firstname LIKE '%".$q."%' OR u.secondname LIKE '%".$q."%' OR u.matricula LIKE '%".$q."%' ) AND ";
-        }
-        $num_usuarios = $em->createQuery(
-            "SELECT COUNT(r.id),r.username,r.value,u.firstname,u.secondname,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname"
-        );
-
-        //echo "SELECT COUNT(r.id),r.username,r.value,u.firstname,u.secondname,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname"
-
-        $num_usuarios = $num_usuarios->getResult();
-        $users_total = $num_usuarios[0][1];
-        $items_per_page = 100;
-        $total_pages = round($users_total/$items_per_page,0);
-
-        $usuarios = $em->createQuery(
-            "SELECT r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname"
-        );
-        //echo "SELECT r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:radcheck r,CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." r.username != '' AND r.username = u.username ORDER BY u.firstname,u.secondname";
-        //$usuarios->setMaxResults($items_per_page);
-        //$usuarios->setFirstResult(($offset-1)*$items_per_page);
-        $usuarios = $usuarios->getResult();
-        
-        foreach ($usuarios as $usuario => $value) {
-            $dql = "SELECT a.macaddress FROM CoreAdminBundle:ssidmacauth a WHERE a.username='".$value['username']."'";
-            $query = $em->createQuery($dql);
-            $macaddress = $query->getResult();
-            if($macaddress){
-                $i = 1;
-                foreach ($macaddress as $mac) {
-                    $usuarios[$usuario]['macaddress'.$i] = $mac["macaddress"];
-                    $i++;
-                }
-            }else{
-                $usuarios[$usuario]['macaddress1'] = '';
-                $usuarios[$usuario]['macaddress2'] = '';
-            }
-            //unset($usuarios[$usuario]['value']);
-        }
-
-        $mensaje = '';
-
-        $columns = array(
-            new Column\NumberColumn(array('id' => 'id', 'field' => 'id', 'visible' => false, 'filterable' => false, 'source' => true, 'primary' => true, 'title' => 'id')),
-            new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
-            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
-            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
-            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
-            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
-            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
-            new Column\TextColumn(array('id' => 'macaddress1', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'macaddress1', 'source' => true, 'align' => 'center', 'title' => 'Macaddress1')),
-            new Column\TextColumn(array('id' => 'macaddress2', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'macaddress2', 'source' => true, 'align' => 'center', 'title' => 'Macaddress2')),
-        );
-
-        $source = new Vector($usuarios,$columns);
-        $grid = $this->get('grid');
-        $grid->setSource($source);
-
-        $myRowAction = new RowAction('Editar', 'admin_usuarios_modificar', false, '_self');
-        $myRowAction->setRouteParameters(array('session' => $session, 'id', 'username' ));
-        $grid->addRowAction($myRowAction);
-
-        $myRowAction1 = new RowAction('Eliminar', 'admin_usuarios_eliminar', false, '_self');
-        $myRowAction1->setRouteParameters(array('session' => $session, 'id' ));
-        $grid->addRowAction($myRowAction1);
-
-        $grid->setLimits(50);
-
-        return $grid->getGridResponse('CoreAdminBundle:users:listreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
-
-        //return $this->render('CoreAdminBundle:users:listreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
-    }
-    /***************************************************************************/
-    public function listunregAction($session,$q,$offset)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $request = Request::createFromGlobals();
-        if ($request->isMethod('POST')) {
-            $q = $request->request->get('q',NULL);
-        }
-        $where_search = '';
-
-        $sesssion = $this->getRequest()->getSession();
-        $campus = $sesssion->get('session_admin');
-
-        switch ( $campus ) {
-            case "all":
-                $where_campus = "";
-            break;
-
-            case $campus:
-                $where_campus = " u.campus = '".$campus."' AND ";
-            break;
-
-            default:
-                $where_campus = "";
-            break;
-        }
-
-        if ($q != NULL && $q != '0') {
-            $where_search = " ( u.firstname LIKE '%".$q."%' OR u.secondname LIKE '%".$q."%' OR u.matricula LIKE '%".$q."%' ) AND ";
-        }
-        $num_usuarios = $em->createQuery(
-            "SELECT COUNT(u.id),u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." u.username != '' AND u.username = '---' ORDER BY u.firstname,u.secondname"
-        );
-
-        //echo "SELECT COUNT(u.id),u.username,u.firstname,u.secondname,u.campus,u.tipo,u.matricula,u.fecha FROM CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." u.username != '' AND u.username = '---' ORDER BY u.firstname,u.secondname";
-
-        $num_usuarios = $num_usuarios->getResult();
-        $users_total = $num_usuarios[0][1];
-        $items_per_page = 100;
-        $total_pages = round($users_total/$items_per_page,0);
-
-        $usuarios = $em->createQuery(
-            "SELECT u.id,u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:Users u WHERE ".$where_search." ".$where_campus." u.username != '' AND u.username = '---' ORDER BY u.firstname,u.secondname"
-        );
-        //$usuarios->setMaxResults($items_per_page);
-        //$usuarios->setFirstResult(($offset-1)*$items_per_page);
-        $usuarios = $usuarios->getResult();
-
-        $mensaje = '';
-
-        $columns = array(
-            new Column\NumberColumn(array('id' => 'id', 'field' => 'id', 'visible' => false, 'filterable' => false, 'source' => true, 'primary' => true, 'title' => 'id')),
-            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
-            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
-            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
-            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
-            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
-        );
-
-        $source = new Vector($usuarios,$columns);
-        $grid = $this->get('grid');
-        $grid->setSource($source);
-        $grid->setLimits(50);
-
-        $myRowAction = new RowAction('', 'admin_usuarios_listar_unreg', false, '_self');
-        $myRowAction->setRouteParameters(array('session' => $session, 'q' => '0', 'offset' => '1' ));
-        $grid->addRowAction($myRowAction);
-
-        return $grid->getGridResponse('CoreAdminBundle:users:listunreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
-
-        //return $this->render('CoreAdminBundle:users:listunreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
     }
     /***************************************************************************/
     public function resetmacsAction()
@@ -458,6 +323,30 @@ class UsersController extends Controller
         }
         return $this->render('CoreAdminBundle:users:resetmacs.html.twig', array( 'fecha' => date('d-M-Y H:m a') ));
     }
-
+    /***************************************************************************/
+    public function valForm( $data )
+    {
+        if (!preg_match('/^[a-zA-Z]{3,}$/', $data['form']['firstname']) && $data['form']['firstname'] != '') {
+            $msg = "Los campos \"nombre\" y \"Apellidos\" deben contener solo caracteres alfabéticos y por lo menos 3 caracteres de longitud";
+            return $msg;
+        }elseif (!preg_match('/^[a-zA-Z]{3,}$/', $data['form']['secondname']) && $data['form']['secondname'] != '') {
+            $msg = "Los campos \"nombre\" y \"Apellidos\" deben contener solo caracteres alfabéticos y por lo menos 3 caracteres de longitud";
+            return $msg;
+        }elseif (!preg_match('/^[0-9]{3,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
+            $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
+            return $msg;
+        }elseif(!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data['form']['email']) && $data['form']['email'] != ''){
+            $msg = "El campo \"E-mail\" no contiene el formato adecuado";
+            return $msg;
+        }elseif (!preg_match('/^[a-zA-Z0-9]{5,}$/', $data['form']['username']) && $data['form']['username'] != '') {
+            $msg = "El campo \"Usuario\" debe contener solo caracteres alfanuméricos  y por lo menos 5 caracteres de longitud";
+            return $msg;
+        }elseif (!preg_match('/^[a-zA-Z0-9]{6,}$/', $data['form']['newpass']) && $data['form']['newpass'] != '') {
+            $msg = "El campo \"contraseña\" debe contener solo caracteres alfanuméricos  y por lo menos 6 caracteres de longitud";
+            return $msg;
+        }
+        return NULL;
+    }
+    /***************************************************************************/
 ##########  ##########
 }

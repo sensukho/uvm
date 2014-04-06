@@ -6,9 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
+
 use Core\AdminBundle\Entity\Users;
-use Core\AdminBundle\Entity\radcheck;
-use Core\AdminBundle\Entity\ssidmacauth;
+use Core\AdminBundle\Entity\Radcheck;
+use Core\AdminBundle\Entity\Ssidmacauth;
 
 class LoginController extends Controller
 {
@@ -431,7 +432,8 @@ class LoginController extends Controller
         }
     }
     /***************************************************************************/
-    public function formatMac($mac){
+    public function formatMac($mac)
+    {
         $longitud = strlen($mac);
             $macaddress = '';
             for($i = 0; $i < $longitud; ++$i)
@@ -443,32 +445,24 @@ class LoginController extends Controller
         return $macaddress;
     }
     /***************************************************************************/
-    public function valForm( $data ){
-        if ( $data['form']['username'] == '' ) {
-            $msg = "El campo de usuario no debe estar vacío";
+    public function valForm( $data )
+    {
+        if (!preg_match('/^[0-9]{3,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
+            $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
             return $msg;
-        }
-        elseif(preg_match('/[^a-z_\-0-9]/i', $data['form']['username'])) {
-            $msg = "El campo de usuario debe ser alfanumérico";
+        }elseif(!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data['form']['email']) && $data['form']['email'] != ''){
+            $msg = "El campo \"E-mail\" no contiene el formato adecuado";
             return $msg;
-        }
-        elseif ( $data['form']['newpass'] == '' ) {
-            $msg = "El campo de password no debe estar vacío";
+        }elseif (!preg_match('/^[a-zA-Z0-9]{5,}$/', $data['form']['username']) && $data['form']['username'] != '') {
+            $msg = "El campo \"Usuario\" debe contener solo caracteres alfanuméricos  y por lo menos 5 caracteres de longitud";
             return $msg;
-        }
-        elseif(preg_match('/[^a-z_\-0-9]/i', $data['form']['newpass'])) {
-            $msg = "El campo de password debe ser alfanumérico";
+        }elseif (!preg_match('/^[a-zA-Z0-9]{6,}$/', $data['form']['newpass']) && $data['form']['newpass'] != '') {
+            $msg = "El campo \"contraseña\" debe contener solo caracteres alfanuméricos  y por lo menos 6 caracteres de longitud";
             return $msg;
-        }
-        elseif ( $data['form']['newpasssecond'] == '' ) {
-            $msg = "El campo de password secundario no debe estar vacío";
+        }elseif (!preg_match('/^[a-zA-Z0-9]{6,}$/', $data['form']['newpasssecond']) && $data['form']['newpasssecond'] != '') {
+            $msg = "El campo \"confirmación de contraseña\" debe contener solo caracteres alfanuméricos  y por lo menos 6 caracteres de longitud";
             return $msg;
-        }
-        elseif(preg_match('/[^a-z_\-0-9]/i', $data['form']['newpasssecond'])) {
-            $msg = "El campo de password secundario debe ser alfanumérico";
-            return $msg;
-        }
-        elseif ( $data['form']['newpass'] !== $data['form']['newpasssecond'] ) {
+        }elseif ( $data['form']['newpass'] !== $data['form']['newpasssecond'] ) {
             $msg = "Los campos de password deben coincidir.";
             return $msg;
         }
