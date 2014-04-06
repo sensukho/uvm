@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use APY\DataGridBundle\Grid\Column;
 use APY\DataGridBundle\Grid\Source\Vector;
+use APY\DataGridBundle\Grid\Action\RowAction;
 use Core\AdminBundle\Entity\radcheck;
 use Core\AdminBundle\Entity\Users;
 
@@ -41,7 +42,6 @@ class ReportsController extends Controller
             ORDER BY r.username ASC"
         );
 
-
         $usuarios = $query->getResult();
 
         $i=0;
@@ -71,12 +71,14 @@ class ReportsController extends Controller
         $source = new Vector($usuarios,$columns);
         $grid = $this->get('grid');
         $grid->setSource($source);
-
         $grid->setLimits(50);
+
+        $myRowAction = new RowAction('', 'admin_usuarios_listar_unreg', false, '_self');
+        $myRowAction->setRouteParameters(array('session' => $session, 'q' => '0', 'offset' => '1' ));
+        $grid->addRowAction($myRowAction);
 
         return $grid->getGridResponse('CoreAdminBundle:reports:active.html.twig', array( 'session' => $session, 'session_id' => $session, 'usuarios' => $usuarios, 'campus' => $campus ));
 
-        //return $this->render('CoreAdminBundle:reports:active.html.twig', array( 'session' => $session, 'session_id' => $session, 'usuarios' => $usuarios, 'campus' => $campus ));
     }
     /***************************************************************************/
     public function historyAction($session)
@@ -137,8 +139,11 @@ class ReportsController extends Controller
         $source = new Vector($usuarios,$columns);
         $grid = $this->get('grid');
         $grid->setSource($source);
-
         $grid->setLimits(50);
+
+        $myRowAction = new RowAction('', 'admin_usuarios_listar_unreg', false, '_self');
+        $myRowAction->setRouteParameters(array('session' => $session, 'q' => '0', 'offset' => '1' ));
+        $grid->addRowAction($myRowAction);
 
         return $grid->getGridResponse('CoreAdminBundle:reports:history.html.twig', array( 'session' => $session, 'session_id' => $session, 'usuarios' => $usuarios, 'campus' => $campus ));
 

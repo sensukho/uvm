@@ -11,6 +11,7 @@ use APY\DataGridBundle\Grid\Action\RowAction;
 use Core\AdminBundle\Entity\Users;
 use Core\AdminBundle\Entity\radcheck;
 use Core\AdminBundle\Entity\ssidmacauth;
+use Core\AdminBundle\Entity\Campus;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class UsersController extends Controller
@@ -19,67 +20,40 @@ class UsersController extends Controller
     public function newAction(Request $request,$session)
     {
         $sesssion = $this->getRequest()->getSession();
-        $campus = $sesssion->get('session_admin');
+        $nombre = $sesssion->get('admin_nombre');
+        $nom = $sesssion->get('admin_nom');
+        $campus = array();
+
+        $em = $this->getDoctrine()->getManager();
+
+        if ($nom == 'UVM') {
+            $query = $em->createQuery("SELECT c.nom FROM CoreAdminBundle:Campus c WHERE c.nom != 'UVM' ORDER BY c.nom ASC");
+            $result = $query->getResult();
+            foreach ($result as $value) {
+                $campus[$value['nom']] = $value['nom'];
+            }
+        }else{
+            $campus[$nom] = $nom;
+        }
 
         $usuario = new Users();
         $usuario->setFecha( new \DateTime('today') );
 
-        switch ( $campus ) {
-            case "all":
-                $form = $this->createFormBuilder($usuario)
-                ->setAction($this->generateUrl('admin_usuarios_crear', array('session' => $session)))
-                ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
-                ->add('secondname', 'text', array('label' => 'Apellidos','attr' => array('placeholder' => 'Apellidos')))
-                ->add('username', 'hidden', array('attr' => array('value' => '---')))
-                ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'matricula')))
-                ->add('campus', 'choice', array('label' => 'Campus', 'choices' => array('CHA' => 'CHA','COY' => 'COY','CUM' => 'CUM','GLDSUR' => 'GLDSUR','HER' => 'HER','HIS' => 'HIS','LOM' => 'LOM','SN' => 'SN','PUE' => 'PUE','QRO' => 'QRO','SRA' => 'SRA','TLA' => 'TLA','TOL' => 'TOL','ZAP' => 'ZAP'), 'attr' => array('placeholder' => 'campus')))
-                ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
-                ->add('ssid', 'hidden', array('attr' => array('value' => '0')))
-                ->add('genpass', 'hidden', array('attr' => array('value' => '0')))
-                ->add('newpass', 'hidden', array('attr' => array('value' => '0')))
-                ->add('newpasssecond', 'hidden', array('attr' => array('value' => '0')))
-                ->add('email', 'hidden', array('attr' => array('value' => '0')))
-                ->add('enviar', 'submit')
-            ->getForm();
-            break;
-
-            case $campus:
-                $campus_field = $campus;
-                $form = $this->createFormBuilder($usuario)
-                ->setAction($this->generateUrl('admin_usuarios_crear', array('session' => $session)))
-                ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
-                ->add('secondname', 'text', array('label' => 'Apellidos','attr' => array('placeholder' => 'Apellidos')))
-                ->add('username', 'hidden', array('attr' => array('value' => '---')))
-                ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'matricula')))
-                ->add('campus', 'hidden', array('attr' => array('value' => $campus_field)) )
-                ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
-                ->add('ssid', 'hidden', array('attr' => array('value' => '0')))
-                ->add('genpass', 'hidden', array('attr' => array('value' => '0')))
-                ->add('newpass', 'hidden', array('attr' => array('value' => '0')))
-                ->add('newpasssecond', 'hidden', array('attr' => array('value' => '0')))
-                ->add('email', 'hidden', array('attr' => array('value' => '0')))
-                ->add('enviar', 'submit')
-            ->getForm();
-            break;
-
-            default:
-                $form = $this->createFormBuilder($usuario)
-                ->setAction($this->generateUrl('admin_usuarios_crear', array('session' => $session)))
-                ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
-                ->add('secondname', 'text', array('label' => 'Apellidos','attr' => array('placeholder' => 'Apellidos')))
-                ->add('username', 'hidden', array('attr' => array('value' => '---')))
-                ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'matricula')))
-                ->add('campus', 'choice', array('label' => 'Campus', 'choices' => array('CHA' => 'CHA','COY' => 'COY','CUM' => 'CUM','GLDSUR' => 'GLDSUR','HER' => 'HER','HIS' => 'HIS','LOM' => 'LOM','SN' => 'SN','PUE' => 'PUE','QRO' => 'QRO','SRA' => 'SRA','TLA' => 'TLA','TOL' => 'TOL','ZAP' => 'ZAP'), 'attr' => array('placeholder' => 'campus')))
-                ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
-                ->add('ssid', 'hidden', array('attr' => array('value' => '0')))
-                ->add('genpass', 'hidden', array('attr' => array('value' => '0')))
-                ->add('newpass', 'hidden', array('attr' => array('value' => '0')))
-                ->add('newpasssecond', 'hidden', array('attr' => array('value' => '0')))
-                ->add('email', 'hidden', array('attr' => array('value' => '0')))
-                ->add('enviar', 'submit')
-            ->getForm();
-            break;
-        }
+        $form = $this->createFormBuilder($usuario)
+            ->setAction($this->generateUrl('admin_usuarios_crear', array('session' => $session)))
+            ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
+            ->add('secondname', 'text', array('label' => 'Apellidos','attr' => array('placeholder' => 'Apellidos')))
+            ->add('username', 'hidden', array('attr' => array('value' => '---')))
+            ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'matricula')))
+            ->add('campus', 'choice', array('label' => 'Campus', 'choices' => $campus, 'attr' => array('placeholder' => 'campus')))
+            ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
+            ->add('ssid', 'hidden', array('attr' => array('value' => '0')))
+            ->add('genpass', 'hidden', array('attr' => array('value' => '0')))
+            ->add('newpass', 'hidden', array('attr' => array('value' => '0')))
+            ->add('newpasssecond', 'hidden', array('attr' => array('value' => '0')))
+            ->add('email', 'hidden', array('attr' => array('value' => '0')))
+            ->add('enviar', 'submit')
+        ->getForm();
 
         $msg = '';
         $formreq = $form;
@@ -114,7 +88,6 @@ class UsersController extends Controller
                 $user->setFecha( new \DateTime('today') );
                 $em->persist($user);
                 $em->flush();
-                //$usuario = new Users();
                 $msg = 'El usuario se ha agregado con éxito.';
             }
         }
@@ -452,18 +425,21 @@ class UsersController extends Controller
 
         $columns = array(
             new Column\NumberColumn(array('id' => 'id', 'field' => 'id', 'visible' => false, 'filterable' => false, 'source' => true, 'primary' => true, 'title' => 'id')),
-            //new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
-            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
-            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
-            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '200', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
-            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '50', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
-            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '50', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
+            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
+            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
+            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
+            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
+            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
         );
 
         $source = new Vector($usuarios,$columns);
         $grid = $this->get('grid');
         $grid->setSource($source);
         $grid->setLimits(50);
+
+        $myRowAction = new RowAction('', 'admin_usuarios_listar_unreg', false, '_self');
+        $myRowAction->setRouteParameters(array('session' => $session, 'q' => '0', 'offset' => '1' ));
+        $grid->addRowAction($myRowAction);
 
         return $grid->getGridResponse('CoreAdminBundle:users:listunreg.html.twig', array( 'session' => $session, 'session_id' => $session, 'mensaje' => $mensaje, 'usuarios' => $usuarios, 'offset' => $offset, 'total_pages' => $total_pages, 'q' => $q, 'campus' => $campus ));
 

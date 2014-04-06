@@ -399,6 +399,45 @@
 				box-shadow: none;
 				text-shadow: -1px -1px 0px rgba(0,0,0,0.5);
 			}
+	
+	#title_index
+	{
+		padding: 1.75em 0.5em 1.75em 0.5em;
+		text-align: center;
+	}
+
+		#title_index h1
+		{
+			font-family: 'Open Sans Condensed', sans-serif;
+			font-weight: 700;
+			color: #000;
+			font-size: 1em;
+			letter-spacing: 0.1em;
+		}
+
+	#title
+	{
+		padding: 1.75em 0.5em 1.75em 0.5em;
+		text-align: left;
+	}
+
+		#title h1
+		{
+			font-family: 'Open Sans Condensed', sans-serif;
+			font-weight: 700;
+			color: #c94663;
+			font-size: 2em;
+			letter-spacing: 0.1em;
+		}
+
+	#msg
+	{
+		width: 90%;
+		font-size:18px;
+		color:white;
+		text-align:center;
+		background-color:#c94663;
+	}
 
 /*********************************************************************************/
 /* Icons                                                                         */

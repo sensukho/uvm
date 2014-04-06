@@ -1,0 +1,25 @@
+Core\AdminBundle\Entity\Campus:
+    type: entity
+    table: null
+    repositoryClass: Core\AdminBundle\Entity\CampusRepository
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        nombre:
+            type: string
+            length: '25'
+        usuario:
+            type: string
+            length: '25'
+        clave:
+            type: string
+            length: '55'
+        nom:
+            type: string
+            length: '5'
+        activo:
+            type: integer
+    lifecycleCallbacks: {  }
