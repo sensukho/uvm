@@ -152,7 +152,7 @@
 
 		body.left-sidebar #content
 		{
-			margin-left: 14em; /* = sidebar width + 7 */
+			margin-left: 13em; /* = sidebar width + 7 */
 		}
 		
 		body.right-sidebar #content

@@ -145,6 +145,10 @@
 			font-size: 2em;
 			letter-spacing: 0.1em;
 		}
+			#logo h1 a
+			{
+				text-decoration: none;
+			}
 
 /*********************************************************************************/
 /* Content                                                                       */
@@ -175,7 +179,7 @@
 		position: absolute;
 		top: 0;
 		padding: 3em 1.35em 1em 1.15em;
-		width: 14em; /* = whatever you want */
+		width: 13em; /* = whatever you want */
 		background: #364050 url('/web/bundles/admin/images/bg1.png');
 		box-shadow: inset -0.1em 0em 0.35em 0em rgba(0,0,0,0.15);
 	}

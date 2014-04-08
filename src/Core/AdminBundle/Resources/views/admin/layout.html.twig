@@ -42,15 +42,26 @@
 						<!-- Logo -->
 							<div id="logo">
 							{% if app.session.get('admin_nom') == 'UVM' %}
-								<h1>UVM</h1>
+								<h1><a href="{{ path('admin_home', {session: app.session.get('session_id')}) }}">UVM</a></h1>
 							{% else %}
-								<h1>UVM<br />{{ app.session.get('admin_nombre') }}</h1>
+								<h1><a href="{{ path('admin_home', {session: app.session.get('session_id')}) }}">UVM<br />{{ app.session.get('admin_nombre') }}</a></h1>
 							{% endif %}
 							</div>
 						<!-- Nav -->
+							{% if app.session.get('admin_nom') == 'UVM' %}
 							<nav id="nav">
 								<ul>
-									<li class="current_page_item"><a href="{{ path('admin_usuarios_crear', {session: app.session.get('session_id')}) }}">Crear usuario</a></li>
+									<li class="current_page_item">Administración</li>
+									<li><a href="#">Reset. Macaddress</a></li>
+									<li><a href="#">Reset. Macaddress</a></li>
+									<li><a href="#">Reset. Macaddress</a></li>
+								</ul>
+							</nav>
+							{% endif %}
+							<nav id="nav">
+								<ul>
+									<li class="current_page_item">Usuarios</li>
+									<li><a href="{{ path('admin_usuarios_crear', {session: app.session.get('session_id')}) }}">Crear usuario</a></li>
 								</ul>
 							</nav>
 							<nav id="nav">

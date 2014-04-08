@@ -48,6 +48,14 @@ class LoginController extends Controller
             }
         }
 
+        foreach ($url as $value) {
+            $pos = strpos($value, "sip");
+            if ($pos === false) {  }
+            else {
+                $sip = explode('=', $value);
+            }
+        }
+
         if ( isset($auth) && $auth[1] == "failed" ) {
             return $this->redirect( "/web/login/error/" );
         }
@@ -59,33 +67,17 @@ class LoginController extends Controller
         $chk = '';
         $msg = '';
 
-        $response = new Response();
+        if ($account = $this->getcookie()) {
+            $url = "http://".$sip[1].":9997/login";
+            return $this->render('CoreAdminBundle:login:layout_zd.html.twig', array( 'user' => $account['user'], 'pass' => $account['pass'], 'url' => $url ));
+        }
 
         if ($user != NULL && $pass != NULL) {
-
-            if ($chk_rec == "chk_rec"){
-                $user = htmlspecialchars(trim($user));
-                $pass = trim($pass);
-
-                $cookieU = new Cookie('usu', $user, time()+60*60*24*30);
-                $cookieP = new Cookie('pass', $pass, time()+60*60*24*30);
-
-                $response->headers->setCookie($cookieU);
-                $response->headers->setCookie($cookieP);
-
-                $response->send();
-
-
-            }else{
-                $response->headers->clearCookie('usu');
-                $response->headers->clearCookie('pass');
-                $response->send();
-            }
 
             $em = $this->getDoctrine()->getManager();
 
             /***** VERIFICA USUARIO *****/
-            $raduser1 = $em->getRepository('CoreAdminBundle:radcheck')->findOneBy(
+            $raduser1 = $em->getRepository('CoreAdminBundle:Radcheck')->findOneBy(
                 array(
                     'username'  => $user,
                     'value'  => $pass
@@ -130,7 +122,7 @@ class LoginController extends Controller
                     $mac = explode('=', $value);
                 }
             }
-            $raduser3 = $em->getRepository('CoreAdminBundle:ssidmacauth')->findOneBy(
+            $raduser3 = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findOneBy(
                 array(
                     'macaddress'  => $this->formatMac( $mac[1] )
                 )
@@ -157,13 +149,7 @@ class LoginController extends Controller
                 }
             }
             if ($exist_mac == 0 || $exist_mac == 1) {
-                foreach ($url as $value) {
-                    $pos = strpos($value, "sip");
-                    if ($pos === false) {  }
-                    else {
-                        $sip = explode('=', $value);
-                    }
-                }
+                $this->setcookie($user, $pass, $chk_rec);
                 $url = "http://".$sip[1].":9997/login";
                 return $this->render('CoreAdminBundle:login:layout_zd.html.twig', array( 'user' => $user, 'pass' => $pass, 'url' => $url ));
             }
@@ -171,17 +157,6 @@ class LoginController extends Controller
             return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => $user, 'pass' => $pass, 'chk' => $chk, 'msg' => $msg, 'params' => $params ));
 
         }
-
-        $user = '';
-        $pass = '';
-
-        $request = $this->get('request');
-        if($request->cookies->has('usu') && $request->cookies->has('pass') ){
-            $user = $request->cookies->get('usu');
-            $pass = $request->cookies->get('pass');
-            $chk = "checked";
-        }
-
         return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => $user, 'pass' => $pass, 'chk' => $chk, 'msg' => $msg, 'params' => $params ));
     }
     /***************************************************************************/
@@ -202,7 +177,7 @@ class LoginController extends Controller
 
         if( $request->query->all() ){
             $params = '?';
-            foreach ($request->query->all() as $key => $value) {
+            foreach ($request->query->all() as $key => $value){
                 $params .= $key.'='.$value.'&';
             }
         }else{
@@ -405,7 +380,7 @@ class LoginController extends Controller
                     $em->persist($user);
                     $em->flush();
 
-                    $raduser = $em->getRepository('CoreAdminBundle:radcheck')->findOneBy(
+                    $raduser = $em->getRepository('CoreAdminBundle:Radcheck')->findOneBy(
                         array(
                             'username'  => $data['form']['username']
                         )
@@ -430,6 +405,47 @@ class LoginController extends Controller
         }else{
             return $this->render('CoreAdminBundle:login:change.html.twig', array( 'form' => $form->createView(), 'msg' => $msg ));
         }
+    }
+    /***************************************************************************/
+    public function setcookie($user = NULL, $pass = NULL, $chk_rec = NULL)
+    {
+        $response = new Response();
+
+        //if ($chk_rec == "chk_rec"){
+            $user = htmlspecialchars(trim($user));
+            $pass = trim($pass);
+
+            //$cookieU = new Cookie('usu', $user, time()+60*60*8);
+            //$cookieP = new Cookie('pass', $pass, time()+60*60*8);
+
+            $cookieU = new Cookie('usu', $user, time()+60);
+            $cookieP = new Cookie('pass', $pass, time()+60);
+
+            $response->headers->setCookie($cookieU);
+            $response->headers->setCookie($cookieP);
+
+            $response->send();
+
+        //}else{
+        //    $response->headers->clearCookie('usu');
+        //    $response->headers->clearCookie('pass');
+        //    $response->send();
+        //}
+    }
+    /***************************************************************************/
+    public function getcookie()
+    {
+        $account = array();
+        $request = $this->get('request');
+        if($request->cookies->has('usu') && $request->cookies->has('pass') ){
+            $user = $request->cookies->get('usu');
+            $pass = $request->cookies->get('pass');
+            $chk = "checked";
+            $account['user'] = $user;
+            $account['pass'] = $pass;
+            return $account;
+        }
+        return false;
     }
     /***************************************************************************/
     public function formatMac($mac)
