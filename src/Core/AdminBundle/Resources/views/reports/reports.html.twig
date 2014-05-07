@@ -1,0 +1,20 @@
+{% extends 'CoreAdminBundle:admin:layout.html.twig' %}
+{% block content %}
+
+    {{ include('CoreAdminBundle:reports:style-grid.html.twig') }}
+
+    <div>
+        <div id="title">
+            <h1>Usuarios :: Campus</h1>
+        </div>
+        <form action="{{ path('admin_reportes', {session: app.session.get('session_id'), type: type}) }}" method="POST">
+	    	<select name="campus" onChange="this.form.submit()">
+	    		<option value="0">--- Seleccione el campus ---</option>
+			{% for name in campus %}
+		        <option value="{{ name.nom }}">{{ name.nombre }}</option>
+		    {% endfor %}
+	    	</select>
+	    </form>
+    </div>
+
+{% endblock %}

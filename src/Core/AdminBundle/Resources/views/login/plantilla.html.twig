@@ -13,10 +13,10 @@
 <!-- Start Form -->
     <div id="cform" class="card move-form" style="">
     <p class="mpf widget-text"><h2>Ingreso:</h2></p>
-	<form id="register" method=GET action="{{ path('portal_register') }}">
+	<div id="register">
 	    <p style="text-align:justify;">Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>:</p>
-        <input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Registro">
-	</form>
+        <button type="button" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" onclick="window.location.href='{{ path('portal_register') }}'">Registro</button>
+	</div>
         {% if msg %}
             <center><p class="mpf widget-text" style="background-color:brown;color:white">{{ msg }}</p></center>
         {% endif %}
@@ -33,11 +33,11 @@
             </ul>
             <ul class="mpf">
                 <label>&nbsp;</label><input type="submit" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" value="Ingresar">
-                <label style="text-align:right;"><a href="{{ path('portal_reset_pass') }}">¿Olvidaste tu contraseña?</a></label>
+                <label style="text-align:right;"><a href="{{ path('portal_reset_pass') }}{{ params }}">¿Olvidaste tu contraseña?</a></label>
             </ul>
         </form>
         <p>&nbsp;</p>
-        <p style="text-align:justify;">Si tienes problemas para ingresar o para navegar por favor acude al Centro de Cómputo de tu campus.</p>
+        <p class="bottom-text">Si tienes problemas para ingresar o para navegar por favor acude al Centro de Cómputo de tu campus.</p>
     </div>
 <!-- End Form -->
 <!-- Start Right Column -->
@@ -52,20 +52,19 @@
                 <p class="mpf widget-text" style=""><h2>Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>:</h2></p>
             </div>
             <div class="" style="display: block;">
-    		<form method=GET action="{{ path('portal_register') }}">
-    	       <input type="submit" id="entrar" name="id" id="sub-a" class="button blue sub-btn" value="Registro">
-    		</form>
+    		  <button type="button" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" onclick="window.location.href='{{ path('portal_register') }}{{ params }}'">Registro</button>
             </div>
         </div>
 <!-- End Widgets -->
     </div>
 <!-- End Right Column -->
 <!-- End Content -->   
-        
+<!--        
     <div id="footer" class="" style="">
         <hr><hr>
         <div id="phone-call"><span class="tblue">
             <img src="/web/bundles/login/img/BannerT.jpg">
         </div>
         <hr>
+-->
 {% endblock %}

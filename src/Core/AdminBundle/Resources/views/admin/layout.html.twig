@@ -48,29 +48,26 @@
 							{% endif %}
 							</div>
 						<!-- Nav -->
-							{% if app.session.get('admin_nom') == 'UVM' %}
-							<nav id="nav">
-								<ul>
-									<li class="current_page_item">Administración</li>
-									<li><a href="#">Reset. Macaddress</a></li>
-									<li><a href="#">Reset. Macaddress</a></li>
-									<li><a href="#">Reset. Macaddress</a></li>
-								</ul>
-							</nav>
-							{% endif %}
 							<nav id="nav">
 								<ul>
 									<li class="current_page_item">Usuarios</li>
-									<li><a href="{{ path('admin_usuarios_crear', {session: app.session.get('session_id')}) }}">Crear usuario</a></li>
+									<li><a href="{{ path('admin_usuarios_crear', {session: app.session.get('session_id')}) }}">Crear Usuario</a></li>
 								</ul>
 							</nav>
 							<nav id="nav">
 								<ul>
 									<li class="current_page_item">Reportes</li>
-									<li><a href="{{ path('admin_reportes_listar_unreg', {session: app.session.get('session_id')}) }}">Usuarios Pendientes</a></li>
-									<li><a href="{{ path('admin_reportes_listar_reg', {session: app.session.get('session_id')}) }}">Usuarios Registrados</a></li>
-									<li><a href="{{ path('admin_reportes_activos', {session: app.session.get('session_id')}) }}">Usuarios Activos</a></li>
-									<li><a href="{{ path('admin_reportes_historial', {session: app.session.get('session_id')}) }}">Historial</a></li>
+								{% if app.session.get('admin_nom') == 'UVM' %}
+									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_listar_unreg'}) }}">Usuarios Pendientes</a></li>
+									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_listar_reg'}) }}">Usuarios Registrados</a></li>
+									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_activos'}) }}">Usuarios Activos</a></li>
+									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_historial'}) }}">Historial</a></li>
+								{% else %}
+									<li><a href="{{ path('admin_reportes_listar_unreg', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Usuarios Pendientes</a></li>
+									<li><a href="{{ path('admin_reportes_listar_reg', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Usuarios Registrados</a></li>
+									<li><a href="{{ path('admin_reportes_activos', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Usuarios Activos</a></li>
+									<li><a href="{{ path('admin_reportes_historial', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Historial</a></li>
+								{% endif %}
 								</ul>
 							</nav>
 							<nav id="nav">

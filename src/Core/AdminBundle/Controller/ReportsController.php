@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManager;
 use APY\DataGridBundle\Grid\Column;
 use APY\DataGridBundle\Grid\Source\Vector;
 use APY\DataGridBundle\Grid\Action\RowAction;
+use APY\DataGridBundle\Grid\Column\ActionsColumn;
+use APY\DataGridBundle\Grid\Export\ExcelExport;
 
 use Core\AdminBundle\Entity\Radcheck;
 use Core\AdminBundle\Entity\Users;
@@ -17,42 +19,96 @@ class ReportsController extends Controller
 {
 ########## REPORTS ##########
     /***************************************************************************/
-    public function listregAction($session)
+    public function indexAction(Request $request,$session,$type)
     {
+        if ($request->isMethod('POST')) {
+            $data = $request->request->all();
+            return $this->redirect( $this->generateUrl($type, array( 'session' => $session, 'campus' => $data['campus'] )) );
+        }
+
         $em = $this->getDoctrine()->getManager();
 
         $sesssion = $this->getRequest()->getSession();
-        $campus = $sesssion->get('session_nom');
+        $nom = $sesssion->get('admin_nom');
+
+        $query = $em->createQuery("SELECT c.nom,c.nombre FROM CoreAdminBundle:Campus c WHERE c.nom != 'UVM' AND c.activo = 1 ORDER BY c.nom ASC");
+        $result = $query->getResult();
+
+        return $this->render('CoreAdminBundle:reports:reports.html.twig', array( 'msg' => '', 'type' => $type, 'campus' => $result ));
+    }
+    /***************************************************************************/
+    public function listunregAction(Request $request,$session,$campus)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $msg = '';
+
+        $sesssion = $this->getRequest()->getSession();
+        $nom = $sesssion->get('admin_nom');
+
+        $where = " AND u.campus = '".$campus."' ";
+
+        $usuarios = $em->createQuery(
+            "SELECT u.id,u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:Users u WHERE u.username != '' AND u.username = '---' ".$where." ORDER BY u.firstname,u.secondname"
+        );
+
+        $usuarios = $usuarios->getResult();
+
+        $num_res = count($usuarios);
+
+        $mensaje = '';
+
+        $columns = array(
+            new Column\NumberColumn(array('id' => 'id', 'field' => 'id', 'visible' => false, 'filterable' => false, 'source' => true, 'primary' => true, 'title' => 'id')),
+            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
+            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
+            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
+            new Column\TextColumn(array('id' => 'campus', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'select', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
+            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'select', 'selectFrom' => 'values', 'values' => array("ALUM"=>"Estudiantes","EMP"=>"Docentes"), 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
+        );
+
+        $source = new Vector($usuarios,$columns);
+        $grid = $this->get('grid');
+        $grid->setSource($source);
+        
+        $grid->setLimits(array(25, 50, 100));
+        $grid->setPage(1);
+
+        if ($nom == 'UVM') {
+            $grid->addExport(new ExcelExport('Exportar usuarios actuales', 'usuarios_pendientes'));
+        }
+
+        // $myRowAction = new RowAction('', 'admin_reportes_listar_unreg', false, '_self');
+        // $myRowAction->setRouteParameters(array('session' => $session, 'campus' => $campus ));
+        // $grid->addRowAction($myRowAction);
+
+        return $grid->getGridResponse('CoreAdminBundle:reports:listunreg.html.twig', array('msg' => $msg, 'num_res' => $num_res));
+    }
+    /***************************************************************************/
+    public function listregAction(Request $request,$session,$campus)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $msg = '';
+        $where = '';
+
+        $sesssion = $this->getRequest()->getSession();
+        $nom = $sesssion->get('admin_nom');
+
+        $where = " AND u.campus = '".$campus."' ";
 
         $usuarios = $em->createQueryBuilder()
           ->from('CoreAdminBundle:Radcheck', 'r')
-          ->select("r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo,s.macaddress as macaddress1,m.macaddress as macaddress2")
+          ->select("r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo,u.ssid,s.macaddress as macaddress1,m.macaddress as macaddress2")
           ->leftJoin("CoreAdminBundle:Users", "u", "WITH", "r.username=u.username")
           ->leftJoin("CoreAdminBundle:Ssidmacauth", "s", "WITH", "s.username=u.username")
           ->leftJoin("CoreAdminBundle:Ssidmacauth", "m", "WITH", "m.username=u.username AND m.macaddress != s.macaddress")
-          ->where("r.username != ''")
+          ->where("r.username != ''".$where)
           ->groupBy("r.username")
         ->getQuery();
 
+
         $usuarios = $usuarios->getResult();
-/*
-        foreach ($usuarios as $usuario => $value) {
-            $dql = "SELECT a.macaddress FROM CoreAdminBundle:Ssidmacauth a WHERE a.username='".$value['username']."'";
-            $query = $em->createQuery($dql);
-            $macaddress = $query->getResult();
-            if($macaddress){
-                $i = 1;
-                foreach ($macaddress as $mac) {
-                    $usuarios[$usuario]['macaddress'.$i] = $mac["macaddress"];
-                    $i++;
-                }
-            }else{
-                $usuarios[$usuario]['macaddress1'] = '';
-                $usuarios[$usuario]['macaddress2'] = '';
-            }
-        }
-*/
-        $mensaje = '';
+
+        $num_res = count($usuarios);
 
         $columns = array(
             new Column\NumberColumn(array('id' => 'id', 'field' => 'id', 'visible' => false, 'filterable' => false, 'source' => true, 'primary' => true, 'title' => 'id')),
@@ -60,8 +116,9 @@ class ReportsController extends Controller
             new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
             new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
             new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
-            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
-            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
+            new Column\TextColumn(array('id' => 'campus', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
+            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'select', 'selectFrom' => 'values', 'values' => array("ALUM"=>"Estudiantes","EMP"=>"Docentes"), 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
+            new Column\TextColumn(array('id' => 'ssid', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'ssid', 'source' => true, 'align' => 'center', 'title' => 'SSID')),
             new Column\TextColumn(array('id' => 'macaddress1', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'macaddress1', 'source' => true, 'align' => 'center', 'title' => 'Macaddress1')),
             new Column\TextColumn(array('id' => 'macaddress2', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'macaddress2', 'source' => true, 'align' => 'center', 'title' => 'Macaddress2')),
         );
@@ -70,67 +127,56 @@ class ReportsController extends Controller
         $grid = $this->get('grid');
         $grid->setSource($source);
 
-        $myRowAction = new RowAction('Editar', 'admin_usuarios_modificar', false, '_self');
-        $myRowAction->setRouteParameters(array('session' => $session, 'id', 'username' ));
-        $grid->addRowAction($myRowAction);
+        $grid->setLimits(array(25, 50, 100));
+        $grid->setPage(1);
 
-        $myRowAction1 = new RowAction('Eliminar', 'admin_usuarios_eliminar', false, '_self');
-        $myRowAction1->setRouteParameters(array('session' => $session, 'id' ));
-        $grid->addRowAction($myRowAction1);
+        $actionsColumn = new ActionsColumn('actions', 'Acciones');
+        $actionsColumn->setSeparator("|");
+        $grid->addColumn($actionsColumn);
 
-        $grid->setLimits(50);
+        $editRowAction = new RowAction('Editar', 'admin_usuarios_modificar', false, '_self');
+        $editRowAction->setRouteParameters(array('session' => $session, 'id' ));
+        $editRowAction->setColumn('actions');
+        $grid->addRowAction($editRowAction);
 
-        return $grid->getGridResponse('CoreAdminBundle:reports:listreg.html.twig', array());
+        if ($nom == 'UVM') {
+            $grid->addExport(new ExcelExport('Exportar usuarios actuales', 'usuarios_registrados'));
+
+            $macRowAction = new RowAction('Macaddress', 'admin_usuarios_eliminar_macs', false, '_self');
+            $macRowAction->setRouteParameters(array('session' => $session, 'id' ));
+            $macRowAction->setColumn('actions');
+            $grid->addRowAction($macRowAction);
+        }
+
+        $delRowAction = new RowAction('Eliminar', 'admin_usuarios_eliminar', false, '_self');
+        $delRowAction->setRouteParameters(array('session' => $session, 'id' ));
+        $delRowAction->setColumn('actions');
+        $grid->addRowAction($delRowAction);
+
+        return $grid->getGridResponse('CoreAdminBundle:reports:listreg.html.twig', array('msg' => $msg, 'num_res' => $num_res));
     }
     /***************************************************************************/
-    public function listunregAction($session)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $usuarios = $em->createQuery(
-            "SELECT u.id,u.firstname,u.secondname,u.matricula,u.campus,u.tipo FROM CoreAdminBundle:Users u WHERE u.username != '' AND u.username = '---' ORDER BY u.firstname,u.secondname"
-        );
-
-        $usuarios = $usuarios->getResult();
-
-        $mensaje = '';
-
-        $columns = array(
-            new Column\NumberColumn(array('id' => 'id', 'field' => 'id', 'visible' => false, 'filterable' => false, 'source' => true, 'primary' => true, 'title' => 'id')),
-            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
-            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
-            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
-            new Column\TextColumn(array('id' => 'campus', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
-            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
-        );
-
-        $source = new Vector($usuarios,$columns);
-        $grid = $this->get('grid');
-        $grid->setSource($source);
-        $grid->setLimits(50);
-
-        $myRowAction = new RowAction('', 'admin_reportes_listar_unreg', false, '_self');
-        $myRowAction->setRouteParameters(array('session' => $session ));
-        $grid->addRowAction($myRowAction);
-
-        return $grid->getGridResponse('CoreAdminBundle:reports:listunreg.html.twig', array());
-
-    }
-    /***************************************************************************/
-	public function activeAction($session)
+	public function activeAction(Request $request,$session,$campus)
     {
 
         $em = $this->getDoctrine()->getManager();
+
+        $sesssion = $this->getRequest()->getSession();
+        $nom = $sesssion->get('admin_nom');
+
+        $where = " AND u.campus = '".$campus."' ";
 
         $query = $em->createQuery(
-            "SELECT u.id,r.username,u.matricula,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
+            "SELECT u.id,r.username,u.matricula,u.campus,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
             FROM CoreAdminBundle:Radacct r,CoreAdminBundle:Users u
-            WHERE r.acctstoptime = '0000-00-00 00:00:00'  AND r.username = u.username
+            WHERE r.acctstoptime = '0000-00-00 00:00:00' AND r.username = u.username ".$where."
             GROUP BY r.username
             ORDER BY r.username ASC"
         );
 
         $usuarios = $query->getResult();
+
+        $num_res = count($usuarios);
 
         $i=0;
         foreach ($usuarios as $usuario) {
@@ -147,10 +193,11 @@ class ReportsController extends Controller
             new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
             new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
             new Column\TextColumn(array('id' => 'framedipaddress', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'framedipaddress', 'source' => true, 'align' => 'center', 'title' => 'IP')),
-            new Column\TextColumn(array('id' => 'calledstationid', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'calledstationid', 'source' => true, 'align' => 'center', 'title' => 'SSID')),
-            new Column\NumberColumn(array('id' => 'acctinputoctets', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctinputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Recibidos')),
-            new Column\NumberColumn(array('id' => 'acctoutputoctets', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctoutputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Enviados')),
-            new Column\TextColumn(array('id' => 'acctsessiontime', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctsessiontime', 'source' => true, 'align' => 'center', 'title' => 'T. Activo')),
+            new Column\TextColumn(array('id' => 'campus', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
+            new Column\TextColumn(array('id' => 'calledstationid', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'calledstationid', 'source' => true, 'align' => 'center', 'title' => 'SSID')),
+            new Column\NumberColumn(array('id' => 'acctinputoctets', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctinputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Recibidos')),
+            new Column\NumberColumn(array('id' => 'acctoutputoctets', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctoutputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Enviados')),
+            new Column\TextColumn(array('id' => 'acctsessiontime', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctsessiontime', 'source' => true, 'align' => 'center', 'title' => 'T. Activo')),
             new Column\NumberColumn(array('id' => 1,'visible' => false)),
             new Column\NumberColumn(array('id' => 2,'visible' => false)),
             new Column\NumberColumn(array('id' => 3,'visible' => false)),
@@ -159,28 +206,41 @@ class ReportsController extends Controller
         $source = new Vector($usuarios,$columns);
         $grid = $this->get('grid');
         $grid->setSource($source);
-        $grid->setLimits(50);
+        
+        $grid->setLimits(array(25, 50, 100));
+        $grid->setPage(1);
+
+        if ($nom == 'UVM') {
+            $grid->addExport(new ExcelExport('Exportar usuarios actuales', 'usuarios_activos'));
+        }
 
         $myRowAction = new RowAction('', 'admin_reportes_listar_unreg', false, '_self');
-        $myRowAction->setRouteParameters(array('session' => $session ));
+        $myRowAction->setRouteParameters(array('session' => $session, 'campus' => $campus ));
         $grid->addRowAction($myRowAction);
 
-        return $grid->getGridResponse('CoreAdminBundle:reports:active.html.twig', array());
+        return $grid->getGridResponse('CoreAdminBundle:reports:active.html.twig', array('num_res' => $num_res));
     }
     /***************************************************************************/
-    public function historyAction($session)
+    public function historyAction(Request $request,$session,$campus)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $sesssion = $this->getRequest()->getSession();
+        $nom = $sesssion->get('admin_nom');
+
+        $where = " AND u.campus = '".$campus."' ";
+
         $query = $em->createQuery(
-            "SELECT r.username,u.matricula,r.id,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
+            "SELECT r.username,u.matricula,u.campus,r.id,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
             FROM CoreAdminBundle:Radacct r,CoreAdminBundle:Users u
-            WHERE r.username = u.username
+            WHERE r.username = u.username ".$where."
             GROUP BY r.username
             ORDER BY r.username ASC"
         );
 
         $usuarios = $query->getResult();
+
+        $num_res = count($usuarios);
 
         $i=0;
         foreach ($usuarios as $usuario) {
@@ -197,10 +257,11 @@ class ReportsController extends Controller
             new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
             new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
             new Column\TextColumn(array('id' => 'framedipaddress', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'framedipaddress', 'source' => true, 'align' => 'center', 'title' => 'IP')),
-            new Column\TextColumn(array('id' => 'calledstationid', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'calledstationid', 'source' => true, 'align' => 'center', 'title' => 'SSID')),
-            new Column\NumberColumn(array('id' => 'acctinputoctets', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctinputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Recibidos')),
-            new Column\NumberColumn(array('id' => 'acctoutputoctets', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctoutputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Enviados')),
-            new Column\TextColumn(array('id' => 'acctsessiontime', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctsessiontime', 'source' => true, 'align' => 'center', 'title' => 'T. Activo')),
+            new Column\TextColumn(array('id' => 'campus', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
+            new Column\TextColumn(array('id' => 'calledstationid', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'calledstationid', 'source' => true, 'align' => 'center', 'title' => 'SSID')),
+            new Column\NumberColumn(array('id' => 'acctinputoctets', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctinputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Recibidos')),
+            new Column\NumberColumn(array('id' => 'acctoutputoctets', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctoutputoctets', 'source' => true, 'align' => 'center', 'title' => 'KB Enviados')),
+            new Column\TextColumn(array('id' => 'acctsessiontime', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'acctsessiontime', 'source' => true, 'align' => 'center', 'title' => 'T. Activo')),
             new Column\NumberColumn(array('id' => 1,'visible' => false)),
             new Column\NumberColumn(array('id' => 2,'visible' => false)),
             new Column\NumberColumn(array('id' => 3,'visible' => false)),
@@ -209,13 +270,19 @@ class ReportsController extends Controller
         $source = new Vector($usuarios,$columns);
         $grid = $this->get('grid');
         $grid->setSource($source);
-        $grid->setLimits(50);
+        
+        $grid->setLimits(array(25, 50, 100));
+        $grid->setPage(1);
+
+        if ($nom == 'UVM') {
+            $grid->addExport(new ExcelExport('Exportar usuarios actuales', 'usuarios_historial'));
+        }
 
         $myRowAction = new RowAction('', 'admin_reportes_listar_unreg', false, '_self');
-        $myRowAction->setRouteParameters(array('session' => $session ));
+        $myRowAction->setRouteParameters(array('session' => $session, 'campus' => $campus ));
         $grid->addRowAction($myRowAction);
 
-        return $grid->getGridResponse('CoreAdminBundle:reports:history.html.twig', array());
+        return $grid->getGridResponse('CoreAdminBundle:reports:history.html.twig', array('num_res' => $num_res));
     }
 ########## COMODIN FUNCTIONS  ##########
     /***************************************************************************/

@@ -1,6 +1,6 @@
 @charset "utf-8";
 
-body, html { color: #F1F1F1; }
+body, html { color: #F1F1F1; background: url('/web/bundles/login/img/bg2.jpg'); }
 
 /*******************
 * Video Background *
@@ -27,7 +27,6 @@ hr { background: #F1F1F1; }
 	max-width: 1024px;
 	min-height: 98%;
 	padding: 0px 50px 0;
-	background: #303030;
 	background: rgba(0,0,0,0.5);
 	z-index: 2;
 }

@@ -62,7 +62,7 @@
     }
 
     #register > #entrar {
-	height: 160px;
+    height: 160px;
         width: 800px;
         margin: 5px 0;
         padding: 5px;
@@ -79,7 +79,7 @@
     #inquiry {
         display: inline-block;
         height: auto;
-        width: 66%;
+        width: 68%;
         padding-bottom: 20px;
         margin-bottom: 20px;
         border: 0px solid #000;
@@ -128,13 +128,38 @@
         height: 55px;   
         width: 45px;
     }
+    #form {
+        display: inline-block;
+        height: auto;
+        width: 620px;
+        text-align: right;
+    }
+    #form_email, #form_matricula, #form_username, #form_genpass, #form_newpass, #form_newpasssecond {
+        height: 60px;
+        width: 400px;
+        margin: 5px 0;
+        padding: 5px;
+        -webkit-text-stroke: 0.10px;
+        font-size: 25pt;
+        font-style: normal;
+    }
+    #form_enviar {
+        height: 80px;
+        width: 250px;
+        margin: 5px 0;
+        padding: 5px;
+        -webkit-text-stroke: 0.10px;
+        font-size: 25pt;
+        font-style: normal;
+    }
     #buttons    { height: 60px; margin: 10px 0 25px 0; padding: 10px; text-align: center; }
     .widget-text { font-size: 40px; padding: 5px }
+    .bottom-text { font-size: 20px; text-align: center; padding: 5px }
 }
 /****************************RESOLUTION MIN 1025****************************/
 @media (min-width: 1025px) {
     #register {
-	display: none;
+    display: none;
     }
     #inquiry {
         display: inline-block;
@@ -177,17 +202,7 @@
         width: 350px;
         text-align: right;
     }
-    #form_enviar {
-        height: 45px;
-        width: 220px;
-        margin: 5px 0;
-        padding: 5px;
-        -webkit-text-stroke: 0.10px;
-        font-size: 16pt;
-        font-style: normal;
-    }
     #form_email, #form_matricula, #form_username, #form_genpass, #form_newpass, #form_newpasssecond {
-        th: 220px;
         margin: 5px 0;
         padding: 5px;
         -webkit-text-stroke: 0.10px;
@@ -205,6 +220,7 @@
     }
     #buttons    { height: 32px; margin: 10px 0 25px 0; text-align: center; }
     .widget-text { padding: 10px }
+    .bottom-text { text-align: center; padding: 5px }
 }
 /********************************************************/
 #inquiry > ul.fieldNotice {

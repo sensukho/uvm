@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 use Core\AdminBundle\Entity\Users;
 use Core\AdminBundle\Entity\Radcheck;
@@ -17,8 +18,8 @@ class LoginController extends Controller
     /***************************************************************************/
     public function startAction(Request $request)
     {
+	$params = '?';
         if( $request->query->all() ){
-            $params = '?';
             foreach ($request->query->all() as $key => $value) {
                 $params .= $key.'='.$value.'&';
             }
@@ -28,6 +29,9 @@ class LoginController extends Controller
     /***************************************************************************/
     public function loginAction(Request $request)
     {
+        $sesssion = $this->getRequest()->getSession();
+
+        $sesssion->get('session_id');
 
         if( $request->query->all() ){
             $params = '?';
@@ -67,8 +71,10 @@ class LoginController extends Controller
         $chk = '';
         $msg = '';
 
-        if ($account = $this->getcookie()) {
+        /***** VERIFICA COOKIE *****/
+        if ($account = $this->getcookie($sesssion)) {
             $url = "http://".$sip[1].":9997/login";
+            //$url = "/web/bienvenida.html/";
             return $this->render('CoreAdminBundle:login:layout_zd.html.twig', array( 'user' => $account['user'], 'pass' => $account['pass'], 'url' => $url ));
         }
 
@@ -88,7 +94,6 @@ class LoginController extends Controller
                 $msg = 'Usuario y/o contraseña inválidos';
                 return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => $user, 'pass' => $pass, 'chk' => $chk, 'msg' => $msg, 'params' => $params ));
             }
-
             /***** VERIFICA SSID *****/
             foreach ($url as $value) {
                 $pos = strpos($value, "ssid");
@@ -103,7 +108,6 @@ class LoginController extends Controller
                     'ssid'  => urldecode( $ssid[1] )
                 )
             );
-
             if (count($raduser2) < 1) {
                 $user_data = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
                     array(
@@ -148,9 +152,15 @@ class LoginController extends Controller
                     $msg = 'Ya existen dos dispositivos registrados con esta cuenta, lo cual es el máximo permitido. Por favor espera a mañana para poder registrar este dispositivo';
                 }
             }
+
+            /***** OTORGA ACCESO *****/
             if ($exist_mac == 0 || $exist_mac == 1) {
-                $this->setcookie($user, $pass, $chk_rec);
+                /***** SETEA COOKIE *****/
+                $this->setcookie($user, $pass, $raduser2->getCampus(), $chk_rec);
+                /***** SETEA SESSION *****/
+                $sesssion->set('user_campus', $raduser2->getCampus());
                 $url = "http://".$sip[1].":9997/login";
+                //$url = "/web/bienvenida.html/";
                 return $this->render('CoreAdminBundle:login:layout_zd.html.twig', array( 'user' => $user, 'pass' => $pass, 'url' => $url ));
             }
 
@@ -182,7 +192,7 @@ class LoginController extends Controller
             }
         }else{
             $form = $request->request->get('form',NULL);
-            $params = $form['genpass'];
+            $params = $form['ssid'];
         }
 
         $usuario->setFecha( new \DateTime('today') );
@@ -190,19 +200,31 @@ class LoginController extends Controller
             ->setAction($this->generateUrl('portal_register'))
                 ->add('matricula', 'text', array('label' => 'Matrícula: ','attr' => array()))
                 ->add('email', 'email', array('label' => 'E-mail: ','attr' => array()))
-                ->add('username', 'text', array('label' => 'Usuario: ','attr' => array('placeholder' => 'elije un nombre de usuario', 'pattern' => '.{5,}')))
-                ->add('genpass', 'hidden', array('attr' => array('value' => $params)))
-                ->add('newpass', 'password', array('label' => 'Password: ','attr' => array('placeholder' => 'elije un password', 'pattern' => '.{6,}')))
-                ->add('newpasssecond', 'password', array('label' => 'Confirmar:','attr' => array('placeholder' => 'confirma el password', 'pattern' => '.{6,}')))
+                ->add('genpass', 'email', array('label' => 'Confirmar: ','attr' => array()))
+                ->add('username', 'text', array('label' => 'Usuario: ','attr' => array('pattern' => '.{5,}')))
+                ->add('newpass', 'password', array('label' => 'Password: ','attr' => array('pattern' => '.{6,}')))
+                ->add('newpasssecond', 'password', array('label' => 'Confirmar:','attr' => array('pattern' => '.{6,}')))
+                ->add('ssid', 'hidden', array('attr' => array('value' => $params)))
                 ->add('enviar', 'submit', array('attr' => array('class' => 'button blue sub-btn')))
         ->getForm();
 
         if ($request->isMethod('POST')) {
             $data = $request->request->all();
+
+            $form = $this->createFormBuilder($usuario)
+                ->setAction($this->generateUrl('portal_register'))
+                ->add('matricula', 'text', array('label' => 'Matrícula: ','attr' => array('value' => $data['form']['matricula'])))
+                ->add('email', 'email', array('label' => 'E-mail: ','attr' => array('value' => $data['form']['email'])))
+                ->add('genpass', 'email', array('label' => 'Confirmar: ','attr' => array('value' => $data['form']['genpass'])))
+                ->add('username', 'text', array('label' => 'Usuario: ','attr' => array('pattern' => '.{5,}','value' => $data['form']['username'])))
+                ->add('newpass', 'password', array('label' => 'Password: ','attr' => array('pattern' => '.{6,}')))
+                ->add('newpasssecond', 'password', array('label' => 'Confirmar:','attr' => array('pattern' => '.{6,}')))
+                ->add('enviar', 'submit', array('attr' => array('class' => 'button blue sub-btn')))
+            ->getForm();
             
             /***** START VALIDATE *****/
             if ($msg = $this->valForm( $data )) {
-                  return $this->render('CoreAdminBundle:login:register.html.twig', array( 'form' => $form->createView(), 'msg' => $msg, 'errors' => '', 'params' => $params ));
+                  return $this->render('CoreAdminBundle:login:register.html.twig', array( 'form' => $form->createView(), 'msg' => $msg, 'errors' => '', 'params' => $params));
               } 
             /***** END VALIDATE *****/
 
@@ -262,12 +284,10 @@ class LoginController extends Controller
                         return $this->render('CoreAdminBundle:login:register.html.twig', array( 'form' => $form->createView(), 'msg' => $msg, 'errors' => '', 'params' => $params ));
                     }
                 }else{
-                    $usuario->setFecha( new \DateTime('today') );
                     $msg = "Esta matrícula ya fue registrada con anterioridad - Utiliza el usuario y password que registraste para unirte a la red. Si el problema persiste, contacta al Centro de Cómputo de tu campus.";
                     return $this->render('CoreAdminBundle:login:register.html.twig', array( 'form' => $form->createView(), 'msg' => $msg, 'errors' => '', 'params' => $params ));
                 }
             }else{
-                $usuario->setFecha( new \DateTime('today') );
                 $msg = "Esta mátrícula no existe en el sistema. Favor de acudir al Centro de Cómputo para recibir asistencia.";
                 return $this->render('CoreAdminBundle:login:register.html.twig', array( 'form' => $form->createView(), 'msg' => $msg, 'errors' => '', 'params' => $params ));
             }
@@ -407,39 +427,41 @@ class LoginController extends Controller
         }
     }
     /***************************************************************************/
-    public function setcookie($user = NULL, $pass = NULL, $chk_rec = NULL)
+    public function setcookie($user = NULL, $pass = NULL, $campus = NULL, $chk_rec = NULL)
     {
         $response = new Response();
 
-        //if ($chk_rec == "chk_rec"){
+        if ($chk_rec == "chk_rec"){
             $user = htmlspecialchars(trim($user));
             $pass = trim($pass);
 
-            //$cookieU = new Cookie('usu', $user, time()+60*60*8);
-            //$cookieP = new Cookie('pass', $pass, time()+60*60*8);
-
-            $cookieU = new Cookie('usu', $user, time()+60);
-            $cookieP = new Cookie('pass', $pass, time()+60);
+            $cookieU = new Cookie('usu', $user, time()+60*60*8);
+            $cookieP = new Cookie('pass', $pass, time()+60*60*8);
+            $cookieC = new Cookie('campus', $campus, time()+60*60*8);
 
             $response->headers->setCookie($cookieU);
             $response->headers->setCookie($cookieP);
+            $response->headers->setCookie($cookieC);
 
             $response->send();
 
-        //}else{
-        //    $response->headers->clearCookie('usu');
-        //    $response->headers->clearCookie('pass');
-        //    $response->send();
-        //}
+        }else{
+            $response->headers->clearCookie('usu');
+            $response->headers->clearCookie('pass');
+            $response->headers->clearCookie('campus');
+            $response->send();
+        }
     }
     /***************************************************************************/
-    public function getcookie()
+    public function getcookie($sesssion)
     {
         $account = array();
         $request = $this->get('request');
         if($request->cookies->has('usu') && $request->cookies->has('pass') ){
             $user = $request->cookies->get('usu');
             $pass = $request->cookies->get('pass');
+            $campus = $request->cookies->get('campus');
+            $sesssion->set('user_campus', $campus);
             $chk = "checked";
             $account['user'] = $user;
             $account['pass'] = $pass;
@@ -466,8 +488,14 @@ class LoginController extends Controller
         if (!preg_match('/^[0-9]{3,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
             $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
             return $msg;
-        }elseif(!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data['form']['email']) && $data['form']['email'] != ''){
+        }elseif(!preg_match("/^[a-z0-9]+[a-z0-9-_]+(\.[_a-zA-Z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*$/", $data['form']['email']) && $data['form']['email'] != ''){
             $msg = "El campo \"E-mail\" no contiene el formato adecuado";
+            return $msg;
+        }elseif(!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data['form']['genpass']) && $data['form']['genpass'] != ''){
+            $msg = "El campo \"Confirmación de E-mail\" no contiene el formato adecuado";
+            return $msg;
+        }elseif ( $data['form']['email'] !== $data['form']['genpass'] ) {
+            $msg = "Los campos de \"E-mail\" deben coincidir.";
             return $msg;
         }elseif (!preg_match('/^[a-zA-Z0-9]{5,}$/', $data['form']['username']) && $data['form']['username'] != '') {
             $msg = "El campo \"Usuario\" debe contener solo caracteres alfanuméricos  y por lo menos 5 caracteres de longitud";
@@ -479,7 +507,7 @@ class LoginController extends Controller
             $msg = "El campo \"confirmación de contraseña\" debe contener solo caracteres alfanuméricos  y por lo menos 6 caracteres de longitud";
             return $msg;
         }elseif ( $data['form']['newpass'] !== $data['form']['newpasssecond'] ) {
-            $msg = "Los campos de password deben coincidir.";
+            $msg = "Los campos de \"contraseña\" deben coincidir.";
             return $msg;
         }
         return NULL;

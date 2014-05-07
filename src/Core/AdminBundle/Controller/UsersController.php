@@ -65,20 +65,20 @@ class UsersController extends Controller
             ->add('genpass', 'hidden', array('attr' => array('value' => '0')))
             ->add('newpass', 'hidden', array('attr' => array('value' => '0')))
             ->add('newpasssecond', 'hidden', array('attr' => array('value' => '0')))
-            ->add('email', 'hidden', array('attr' => array('value' => '0')))
+            ->add('email', 'hidden', array('attr' => array('value' => 'uvm@uvm.com')))
             ->add('enviar', 'submit')
         ->getForm();
 
         if ($request->isMethod('POST')) {
-            
+
             $data = $request->request->all();
 
             /*************************************************/
             /** START Validacion
             /*************************************************/
-            if ($msg = $this->valForm( $data )) {
+            if ($msg = $this->valForm2( $data )) {
                   return $this->render('CoreAdminBundle:users:new.html.twig', array( 'form' => $form->createView(), 'msg' => $msg ));
-              } 
+              }
             /*************************************************/
             /** END Validacion
             /*************************************************/
@@ -118,7 +118,7 @@ class UsersController extends Controller
         return $this->render('CoreAdminBundle:users:new.html.twig', array( 'form' => $form->createView(), 'msg' => $msg ));
     }
     /***************************************************************************/
-    public function editAction($session,$id,$username)
+    public function editAction($session,$id)
     {
         /*************************************************/
         /** START Session
@@ -153,11 +153,36 @@ class UsersController extends Controller
         $user_form = new Users();
         $form = $this->createFormBuilder($user_form);
 
+        $usuario = $em->getRepository('CoreAdminBundle:Radcheck')->find($id);
+        $username = $usuario->getUsername();
+
         $usuario = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
             array(
                 'username'  => $username
             )
         );
+
+	$user_form->setFirstname( $usuario->getFirstname() );
+        $user_form->setSecondname( $usuario->getSecondname() );
+        $user_form->setMatricula( $usuario->getMatricula() );
+        $user_form->setEmail( $usuario->getEmail() );
+        $user_form->setUsername( $usuario->getUsername() );
+        $user_form->setCampus( $usuario->getCampus() );
+        $user_form->setTipo( $usuario->getTipo() );
+        $user_form->setNewpass( $usuario->getNewpass() );
+
+        $form = $this->createFormBuilder($user_form)
+            ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $username )) )
+            ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
+            ->add('secondname', 'text', array('label' => 'Apellidos (paterno y materno separados por un espacio)','attr' => array('placeholder' => 'Apellidos')))
+            ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'Matricula')))
+            ->add('campus', 'choice', array('label' => 'Campus', 'choices' => $campus, 'data' => $usuario->getCampus(), 'attr' => array('placeholder' => 'campus')))
+            ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
+            ->add('email', 'email', array('label' => 'E-mail','attr' => array('placeholder' => 'correo electronico')))
+            ->add('username', 'text', array('label' => 'Usuario (elije un nombre de usuario de por lo menos 5 caracteres)','attr' => array('placeholder' => 'Mínimo de 5 caracteres.')))
+            ->add('newpass', 'text', array('label' => 'Password (mínimo 6 caracteres, no se diferencian mayúsculas de minúsculas y utiliza solo caracteres alfanuméricos.)','attr' => array('placeholder' => 'Mínimo de 6 caracteres.', 'pattern' => '.{6,}')))
+            ->add('enviar', 'submit')
+        ->getForm();
 
         if ($request->isMethod('POST')) {
 
@@ -178,7 +203,7 @@ class UsersController extends Controller
                     'username'  => $username
                 )
             );
-            $usuario2 = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findOneBy(
+            $usuario2 = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findBy(
                 array(
                     'username'  => $username,
                 )
@@ -208,10 +233,11 @@ class UsersController extends Controller
                 $em->flush();
 
                 if($usuario2){
-                    $usuario2->setUsername($data['form']['username']);
-
-                    $em->persist($usuario2);
-                    $em->flush();
+                    foreach ($usuario2 as $usuario) {
+                        $usuario->setUsername($data['form']['username']);
+                        $em->persist($usuario);
+                        $em->flush();
+                    }
                 }
                 $msg = 'Usuario modificado con éxito !';
                 $usuario = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
@@ -242,30 +268,9 @@ class UsersController extends Controller
                     ->add('enviar', 'submit')
                 ->getForm();
             }
-        }else{
-            $user_form->setFirstname( $usuario->getFirstname() );
-            $user_form->setSecondname( $usuario->getSecondname() );
-            $user_form->setMatricula( $usuario->getMatricula() );
-            $user_form->setEmail( $usuario->getEmail() );
-            $user_form->setUsername( $usuario->getUsername() );
-            $user_form->setCampus( $usuario->getCampus() );
-            $user_form->setTipo( $usuario->getTipo() );
-            $user_form->setNewpass( $usuario->getNewpass() );
-
-            $form = $this->createFormBuilder($user_form)
-                ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $username )) )
-                ->add('firstname', 'text', array('label' => 'Nombre','attr' => array('placeholder' => 'Nombre')))
-                ->add('secondname', 'text', array('label' => 'Apellidos (paterno y materno separados por un espacio)','attr' => array('placeholder' => 'Apellidos')))
-                ->add('matricula', 'text', array('label' => 'Matricula','attr' => array('placeholder' => 'Matricula')))
-                ->add('campus', 'choice', array('label' => 'Campus', 'choices' => $campus, 'data' => $usuario->getCampus(), 'attr' => array('placeholder' => 'campus')))
-                ->add('tipo', 'choice', array('label' => 'Tipo', 'choices' => array('ALUM' => 'ALUMNO','EMP' => 'EMPLEADO'), 'attr' => array('placeholder' => 'tipo')))
-                ->add('email', 'email', array('label' => 'E-mail','attr' => array('placeholder' => 'correo electronico')))
-                ->add('username', 'text', array('label' => 'Usuario (elije un nombre de usuario de por lo menos 5 caracteres)','attr' => array('placeholder' => 'Mínimo de 5 caracteres.')))
-                ->add('newpass', 'text', array('label' => 'Password (mínimo 6 caracteres, no se diferencian mayúsculas de minúsculas y utiliza solo caracteres alfanuméricos.)','attr' => array('placeholder' => 'Mínimo de 6 caracteres.', 'pattern' => '.{6,}')))
-                ->add('enviar', 'submit')
-            ->getForm();
         }
-        return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $campus ));
+
+       return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $campus ));
     }
     /***************************************************************************/
     public function delAction($session,$id)
@@ -303,7 +308,7 @@ class UsersController extends Controller
 
             $mensaje = 'Usuario eliminado con éxito !';
             $usuarios = $em->getRepository('CoreAdminBundle:Radcheck')->findAll();
-            return $this->redirect( $this->generateUrl('admin_usuarios_listar_reg', array( 'session' => $session, 'offset' => '1', 'session_id' => $session, 'msg' => $mensaje, 'usuarios' => $usuarios, 'q' => '0' )) );
+            return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'offset' => '1', 'session_id' => $session, 'msg' => $mensaje, 'usuarios' => $usuarios, 'q' => '0' )) );
         }else{
             $mensaje = "¿Seguro que desea eliminar al usuario '".$usuario_radchek->getUsername()."' ?";
         }
@@ -311,13 +316,36 @@ class UsersController extends Controller
         return $this->render('CoreAdminBundle:users:del.html.twig', array( 'session' => $session, 'session_id' => $session, 'msg' => $mensaje, 'usuario' => $usuario_radchek, 'campus' => $campus ));
     }
     /***************************************************************************/
+    public function delmacAction($session,$id)
+    {
+        $sesssion = $this->getRequest()->getSession();
+        $campus = $sesssion->get('session_admin');
+
+        $request = Request::createFromGlobals();
+        $confirm = $request->request->get('confirm',NULL);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $usuario_radchek = $em->getRepository('CoreAdminBundle:Radcheck')->find($id);
+        $usuario_ssidmacauth = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findBy(array('username' => $usuario_radchek->getUsername()));
+
+        foreach ($usuario_ssidmacauth as $user) {
+            $em->remove($user);
+            $em->flush();
+        }
+
+        $msg = 'Se realizo la limpieza con éxito !';
+
+        return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'msg' => $msg )) );
+    }
+    /***************************************************************************/
     public function resetmacsAction()
     {
         $em = $this->getDoctrine()->getManager();
-        $usuarios = $em->getRepository('CoreAdminBundle:ssidmacauth')->findAll();
+        $usuarios = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findAll();
 
         foreach ($usuarios as $usuario => $value) {
-            $user = $em->getRepository('CoreAdminBundle:ssidmacauth')->find( $value->getId() );
+            $user = $em->getRepository('CoreAdminBundle:Ssidmacauth')->find( $value->getId() );
             $em->remove($user);
             $em->flush();
         }
@@ -326,16 +354,16 @@ class UsersController extends Controller
     /***************************************************************************/
     public function valForm( $data )
     {
-        if (!preg_match('/^[a-zA-Z]{3,}$/', $data['form']['firstname']) && $data['form']['firstname'] != '') {
+        if (!preg_match('/^[a-zA-Z ]{3,}$/', $data['form']['firstname']) && $data['form']['firstname'] != '') {
             $msg = "Los campos \"nombre\" y \"Apellidos\" deben contener solo caracteres alfabéticos y por lo menos 3 caracteres de longitud";
             return $msg;
-        }elseif (!preg_match('/^[a-zA-Z]{3,}$/', $data['form']['secondname']) && $data['form']['secondname'] != '') {
+        }elseif (!preg_match('/^[a-zA-Z ]{3,}$/', $data['form']['secondname']) && $data['form']['secondname'] != '') {
             $msg = "Los campos \"nombre\" y \"Apellidos\" deben contener solo caracteres alfabéticos y por lo menos 3 caracteres de longitud";
             return $msg;
         }elseif (!preg_match('/^[0-9]{3,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
             $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
             return $msg;
-        }elseif(!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data['form']['email']) && $data['form']['email'] != ''){
+        }elseif(!preg_match("/^[a-zA-Z0-9]+[a-zA-Z0-9-_]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$/", $data['form']['email']) && $data['form']['email'] != ''){
             $msg = "El campo \"E-mail\" no contiene el formato adecuado";
             return $msg;
         }elseif (!preg_match('/^[a-zA-Z0-9]{5,}$/', $data['form']['username']) && $data['form']['username'] != '') {
@@ -348,5 +376,21 @@ class UsersController extends Controller
         return NULL;
     }
     /***************************************************************************/
+    public function valForm2( $data )
+    {
+        if (!preg_match('/^[a-zA-Z ]{3,}$/', $data['form']['firstname']) && $data['form']['firstname'] != '') {
+            $msg = "Los campos \"nombre\" y \"Apellidos\" deben contener solo caracteres alfabéticos y por lo menos 3 caracteres de longitud";
+            return $msg;
+        }elseif (!preg_match('/^[a-zA-Z ]{3,}$/', $data['form']['secondname']) && $data['form']['secondname'] != '') {
+            $msg = "Los campos \"nombre\" y \"Apellidos\" deben contener solo caracteres alfabéticos y por lo menos 3 caracteres de longitud";
+            return $msg;
+        }elseif (!preg_match('/^[0-9]{4,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
+            $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
+            return $msg;
+        }
+        return NULL;
+    }
+    /***************************************************************************/
+
 ##########  ##########
 }

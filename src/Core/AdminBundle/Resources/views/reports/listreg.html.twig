@@ -2,12 +2,13 @@
 {% block content %}
 
     {{ include('CoreAdminBundle:reports:style-grid.html.twig') }}
-
+    <div id="title">
+        <h1>Usuarios :: Registrados :: Encontrados: {{ num_res }}</h1>
+    </div>
+    {% if grid %}
     <div>
-        <div id="title">
-            <h1>Usuarios :: Registrados</h1>
-        </div>
         {{ grid(grid) }}
     </div>
+    {% endif %}
 
 {% endblock %}

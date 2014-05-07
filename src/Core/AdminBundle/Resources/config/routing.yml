@@ -19,8 +19,12 @@ admin_usuarios_crear:
     defaults: { _controller: CoreAdminBundle:Users:new }
 
 admin_usuarios_modificar:
-    pattern:  /admin/users/edit/{session}/{id}/{username}/
+    pattern:  /admin/users/edit/{session}/{id}/
     defaults: { _controller: CoreAdminBundle:Users:edit }
+
+admin_usuarios_eliminar_macs:
+    pattern:  /admin/users/delmac/{session}/{id}/
+    defaults: { _controller: CoreAdminBundle:Users:delmac }
 
 admin_usuarios_eliminar:
     pattern:  /admin/users/del/{session}/{id}/
@@ -32,20 +36,24 @@ admin_reset_macs:
 
 ##### ADMINISTRATOR :: REPORTES #####
 
+admin_reportes:
+    pattern:  /admin/reports/list/{session}/{type}/
+    defaults: { _controller: CoreAdminBundle:Reports:index }
+
 admin_reportes_listar_reg:
-    pattern:  /admin/reports/listreg/{session}/
+    pattern:  /admin/reports/listreg/{session}/{campus}/
     defaults: { _controller: CoreAdminBundle:Reports:listreg }
 
 admin_reportes_listar_unreg:
-    pattern:  /admin/reports/listunreg/{session}/
+    pattern:  /admin/reports/listunreg/{session}/{campus}/
     defaults: { _controller: CoreAdminBundle:Reports:listunreg }
 
 admin_reportes_activos:
-    pattern:  /admin/reports/active/{session}/
+    pattern:  /admin/reports/active/{session}/{campus}/
     defaults: { _controller: CoreAdminBundle:Reports:active }
 
 admin_reportes_historial:
-    pattern:  /admin/reports/history/{session}/
+    pattern:  /admin/reports/history/{session}/{campus}/
     defaults: { _controller: CoreAdminBundle:Reports:history }
 
 ##### PORTAL :: LOGIN #####
