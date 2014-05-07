@@ -276,7 +276,7 @@ class UsersController extends Controller
     public function delAction($session,$id)
     {
         $sesssion = $this->getRequest()->getSession();
-        $campus = $sesssion->get('session_admin');
+        $campus = $sesssion->get('admin_nom');
 
         $request = Request::createFromGlobals();
         $confirm = $request->request->get('confirm',NULL);
@@ -308,11 +308,11 @@ class UsersController extends Controller
 
             $mensaje = 'Usuario eliminado con éxito !';
             $usuarios = $em->getRepository('CoreAdminBundle:Radcheck')->findAll();
-            return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'offset' => '1', 'session_id' => $session, 'msg' => $mensaje, 'usuarios' => $usuarios, 'q' => '0' )) );
+            return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'campus' => $campus )) );
         }else{
             $mensaje = "¿Seguro que desea eliminar al usuario '".$usuario_radchek->getUsername()."' ?";
         }
-
+        var_dump($campus);
         return $this->render('CoreAdminBundle:users:del.html.twig', array( 'session' => $session, 'session_id' => $session, 'msg' => $mensaje, 'usuario' => $usuario_radchek, 'campus' => $campus ));
     }
     /***************************************************************************/
@@ -336,7 +336,7 @@ class UsersController extends Controller
 
         $msg = 'Se realizo la limpieza con éxito !';
 
-        return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'msg' => $msg )) );
+        return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'campus' => $campus )) );
     }
     /***************************************************************************/
     public function resetmacsAction()
