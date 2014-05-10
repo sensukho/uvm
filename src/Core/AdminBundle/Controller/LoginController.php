@@ -279,8 +279,6 @@ class LoginController extends Controller
                         ;
                         $this->get('mailer')->send($message);
 
-                        var_dump($params);
-
                         return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => '', 'pass' => '', 'chk' => '', 'msg' => $msg, 'params' => $params ));
                     }else{
                         $msg = "El nombre de usuario seleccionado ya está utilizado por otra cuenta. Favor de elegir otro.";
