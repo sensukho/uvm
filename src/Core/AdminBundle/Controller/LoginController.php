@@ -219,6 +219,7 @@ class LoginController extends Controller
                 ->add('username', 'text', array('label' => 'Usuario: ','attr' => array('pattern' => '.{5,}','value' => $data['form']['username'])))
                 ->add('newpass', 'password', array('label' => 'Password: ','attr' => array('pattern' => '.{6,}')))
                 ->add('newpasssecond', 'password', array('label' => 'Confirmar:','attr' => array('pattern' => '.{6,}')))
+                ->add('ssid', 'hidden', array('attr' => array('value' => $params)))
                 ->add('enviar', 'submit', array('attr' => array('class' => 'button blue sub-btn')))
             ->getForm();
             
@@ -277,6 +278,8 @@ class LoginController extends Controller
                             )
                         ;
                         $this->get('mailer')->send($message);
+
+                        var_dump($params);
 
                         return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => '', 'pass' => '', 'chk' => '', 'msg' => $msg, 'params' => $params ));
                     }else{
