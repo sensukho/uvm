@@ -831,8 +831,12 @@ input.blurred, textarea.blurred {
 @media only screen and (max-device-width : 600px) {
     .header-fixed-container { position: absolute; }
 }
-@media only screen and (max-width : 1050px) {
+@media only screen and (max-width : 1024px) {
+    html, body { width: 100%; }
+    .header-fixed-container { position: absolute; }
+}
+
+@media only screen and (min-width : 1024px) {
     html, body { width: 1050px; }
     .header-fixed-container { position: absolute; }
-
 }

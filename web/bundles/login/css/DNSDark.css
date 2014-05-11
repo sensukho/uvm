@@ -16,6 +16,30 @@ body, html { color: #F1F1F1; background: url('/web/bundles/login/img/bg2.jpg'); 
 	z-index: 1;
 }
 
+@media (max-width: 1024px) {
+	#contentbg {
+		/*margin: 0 auto;*/
+		position: relative;
+		max-width: 90%;
+		min-height: 98%;
+		padding: 0px 50px 0;
+		background: rgba(0,0,0,0.5);
+		z-index: 2;
+	}
+}
+
+@media (min-width: 1025px) {
+	#contentbg {
+		margin: 0 auto;
+		position: relative;
+		max-width: 1024px;
+		min-height: 98%;
+		padding: 0px 50px 0;
+		background: rgba(0,0,0,0.5);
+		z-index: 2;
+	}	
+}
+
 /*********************
 * Dark Page Elements *
 *********************/
