@@ -70,6 +70,7 @@ class LoginController extends Controller
         $chk_rec = $request->request->get('chk_rec',NULL);
         $chk = '';
         $msg = '';
+        $ssid = NULL;
 
         /***** VERIFICA COOKIE *****/
         if ($account = $this->getcookie($sesssion)) {
