@@ -95,16 +95,25 @@ class ReportsController extends Controller
 
         $where = " AND u.campus = '".$campus."' ";
 
+        // $usuarios = $em->createQueryBuilder()
+        //   ->from('CoreAdminBundle:Radcheck', 'r')
+        //   ->select("r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo,u.ssid,s.macaddress as macaddress1,m.macaddress as macaddress2")
+        //   ->leftJoin("CoreAdminBundle:Users", "u", "WITH", "r.username=u.username")
+        //   ->leftJoin("CoreAdminBundle:Ssidmacauth", "s", "WITH", "s.username=u.username")
+        //   ->leftJoin("CoreAdminBundle:Ssidmacauth", "m", "WITH", "m.username=u.username AND m.macaddress != s.macaddress")
+        //   ->where("r.username != ''".$where)
+        //   ->groupBy("r.username")
+        // ->getQuery();
+
         $usuarios = $em->createQueryBuilder()
           ->from('CoreAdminBundle:Radcheck', 'r')
           ->select("r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo,u.ssid,s.macaddress as macaddress1,m.macaddress as macaddress2")
           ->leftJoin("CoreAdminBundle:Users", "u", "WITH", "r.username=u.username")
-          ->leftJoin("CoreAdminBundle:Ssidmacauth", "s", "WITH", "s.username=u.username")
-          ->leftJoin("CoreAdminBundle:Ssidmacauth", "m", "WITH", "m.username=u.username AND m.macaddress != s.macaddress")
+          ->leftJoin("CoreAdminBundle:Ssidmacauth", "s", "WITH", "s.username=r.username")
+          ->leftJoin("CoreAdminBundle:Ssidmacauth", "m", "WITH", "m.username=r.username AND m.macaddress != s.macaddress")
           ->where("r.username != ''".$where)
           ->groupBy("r.username")
         ->getQuery();
-
 
         $usuarios = $usuarios->getResult();
 
