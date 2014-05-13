@@ -71,6 +71,9 @@ class LoginController extends Controller
         $chk = '';
         $msg = '';
         $ssid = NULL;
+        $mac = NULL;
+        $sip = NULL;
+        $user_data = NULL;
 
         /***** VERIFICA COOKIE *****/
         if ($account = $this->getcookie($sesssion)) {
@@ -106,7 +109,7 @@ class LoginController extends Controller
             $raduser2 = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
                 array(
                     'username'  => $user,
-                    'ssid'  => urldecode( $ssid[1] )
+                    'ssid'  => urldecode( trim($ssid[1]) )
                 )
             );
             if (count($raduser2) < 1) {
@@ -115,7 +118,7 @@ class LoginController extends Controller
                         'username'  => $user
                     )
                 );
-                $msg = 'A este usuario le corresponde la red "'.$user_data->getSsid().'" ( Conectado a: "'.urldecode( $ssid[1] ).'" ). Por favor cambie de red WiFi e intente de nuevo.';
+                $msg = 'A este usuario le corresponde la red "'.$user_data->getSsid().'" ( Conectado a: "'.urldecode( trim($ssid[1]) ).'" ). Por favor cambie de red WiFi e intente de nuevo.';
                 return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => $user, 'pass' => $pass, 'chk' => $chk, 'msg' => $msg, 'params' => $params ));
             }
 
