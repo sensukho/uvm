@@ -33,6 +33,11 @@ class LoginController extends Controller
 
         $sesssion->get('session_id');
 
+        $ssid = NULL;
+        $mac = NULL;
+        $sip = NULL;
+        $user_data = NULL;
+
         if( $request->query->all() ){
             $params = '?';
             foreach ($request->query->all() as $key => $value) {
@@ -70,10 +75,6 @@ class LoginController extends Controller
         $chk_rec = $request->request->get('chk_rec',NULL);
         $chk = '';
         $msg = '';
-        $ssid = NULL;
-        $mac = NULL;
-        $sip = NULL;
-        $user_data = NULL;
 
         /***** VERIFICA COOKIE *****/
         if ($account = $this->getcookie($sesssion)) {
