@@ -21,7 +21,9 @@ class LoginController extends Controller
 	$params = '?';
         if( $request->query->all() ){
             foreach ($request->query->all() as $key => $value) {
-                $params .= $key.'='.$value.'&';
+                if ( $key == 'sip' || $key == 'client_mac' || $key == 'ssid' || $key == 'auth' ) {
+                    $params .= $key.'='.$value.'&';
+                }
             }
         }
         return $this->redirect( "/web/login/".$params );
@@ -41,7 +43,9 @@ class LoginController extends Controller
         if( $request->query->all() ){
             $params = '?';
             foreach ($request->query->all() as $key => $value) {
-                $params .= $key.'='.$value.'&';
+                if ( $key == 'sip' || $key == 'client_mac' || $key == 'ssid' || $key == 'auth' ) {
+                    $params .= $key.'='.$value.'&';
+                }
             }
             $url = explode('&', $params);
         }else{
