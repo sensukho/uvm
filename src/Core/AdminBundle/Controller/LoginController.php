@@ -73,6 +73,10 @@ class LoginController extends Controller
             return $this->redirect( "/web/login/error/" );
         }
 
+	if ($request->isMethod('POST')) {
+		$sesssion->remove('user_reg');
+	}
+
         $request = Request::createFromGlobals();
         $user = $request->request->get('username',NULL);
         $pass = $request->request->get('password',NULL);
@@ -186,11 +190,15 @@ class LoginController extends Controller
     /***************************************************************************/
     public function welcomeAction()
     {
+	$sesssion->remove('user_reg');
         return $this->render('CoreAdminBundle:login:bienvenida.html.twig', array());
     }
     /***************************************************************************/
     public function registerAction(Request $request)
     {
+	$sesssion = $this->getRequest()->getSession();
+	$sesssion->remove('user_reg');
+
         $usuario = new Users();
         $msg = '';
 
@@ -287,7 +295,8 @@ class LoginController extends Controller
                             )
                         ;
                         $this->get('mailer')->send($message);
-			
+
+			$sesssion->set('user_reg', $msg);
 			return $this->redirect( "http://www.universidad-uvm.mx" );
                         //return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => '', 'pass' => '', 'chk' => '', 'msg' => $msg, 'params' => $params ));
                     }else{
@@ -309,6 +318,9 @@ class LoginController extends Controller
     /***************************************************************************/
     public function resetAction(Request $request)
     {
+	$sesssion = $this->getRequest()->getSession();
+	$sesssion->remove('user_reg');
+
         $msg = '';
 
         if( $request->query->all() ){

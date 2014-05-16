@@ -17,6 +17,9 @@
 	    <p style="text-align:justify;">Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>:</p>
         <button type="button" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" onclick="window.location.href='{{ path('portal_register') }}'">Registro</button>
 	</div>
+	{% if app.session.get('user_reg') %}
+            <center><p class="mpf widget-text" style="background-color:brown;color:white">{{ app.session.get('user_reg') }}</p></center>
+        {% endif %}
         {% if msg %}
             <center><p class="mpf widget-text" style="background-color:brown;color:white">{{ msg }}</p></center>
         {% endif %}
