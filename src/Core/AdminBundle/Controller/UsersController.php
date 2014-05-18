@@ -273,11 +273,8 @@ class UsersController extends Controller
        return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $campus ));
     }
     /***************************************************************************/
-    public function delAction($session,$id)
+    public function delAction($session,$id,$campus)
     {
-        $sesssion = $this->getRequest()->getSession();
-        $campus = $sesssion->get('admin_nom');
-
         $request = Request::createFromGlobals();
         $confirm = $request->request->get('confirm',NULL);
 
@@ -305,9 +302,6 @@ class UsersController extends Controller
             $em->persist($usuario_users);
             $em->flush();
 
-
-            $mensaje = 'Usuario eliminado con éxito !';
-            $usuarios = $em->getRepository('CoreAdminBundle:Radcheck')->findAll();
             return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'campus' => $campus )) );
         }else{
             $mensaje = "¿Seguro que desea eliminar al usuario '".$usuario_radchek->getUsername()."' ?";
@@ -315,11 +309,31 @@ class UsersController extends Controller
         return $this->render('CoreAdminBundle:users:del.html.twig', array( 'session' => $session, 'session_id' => $session, 'msg' => $mensaje, 'usuario' => $usuario_radchek, 'campus' => $campus ));
     }
     /***************************************************************************/
-    public function delmacAction($session,$id)
+    public function clearAction($session,$id,$campus)
     {
-        $sesssion = $this->getRequest()->getSession();
-        $campus = $sesssion->get('admin_nom');
+        $em = $this->getDoctrine()->getManager();
 
+        $usuario = $em->getRepository('CoreAdminBundle:Users')->find($id);
+        $usuario_radchek = $em->getRepository('CoreAdminBundle:Radcheck')->findOneBy(array('username' => $usuario->getUsername()));
+
+        if($usuario_radchek){
+            $em->remove($usuario_radchek);
+            $em->flush();
+        }
+
+        $usuario->setUsername('---');
+        $usuario->setGenpass(0);
+        $usuario->setNewpass(0);
+        $usuario->setEmail('');
+
+        $em->persist($usuario);
+        $em->flush();
+
+        return $this->redirect( $this->generateUrl('admin_reportes_mantenimiento', array( 'session' => $session, 'campus' => $campus, 'msg' => '' )) );
+    }
+    /***************************************************************************/
+    public function delmacAction($session,$id,$campus)
+    {
         $request = Request::createFromGlobals();
         $confirm = $request->request->get('confirm',NULL);
 
@@ -335,20 +349,18 @@ class UsersController extends Controller
 
         $msg = 'Se realizo la limpieza con éxito !';
 
-        //return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'campus' => $campus )) );
         return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'campus' => $campus )) );
     }
     /***************************************************************************/
     public function resetmacsAction()
     {
         $em = $this->getDoctrine()->getManager();
-        $usuarios = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findAll();
 
-        foreach ($usuarios as $usuario => $value) {
-            $user = $em->getRepository('CoreAdminBundle:Ssidmacauth')->find( $value->getId() );
-            $em->remove($user);
-            $em->flush();
-        }
+        $em = $this->getDoctrine()->getManager();
+        $conn = $em->getConnection();
+
+        $conn->exec('TRUNCATE TABLE ssidmacauth');
+
         return $this->render('CoreAdminBundle:users:resetmacs.html.twig', array( 'fecha' => date('d-M-Y H:m a') ));
     }
     /***************************************************************************/

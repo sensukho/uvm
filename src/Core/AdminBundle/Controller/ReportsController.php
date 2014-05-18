@@ -23,7 +23,11 @@ class ReportsController extends Controller
     {
         if ($request->isMethod('POST')) {
             $data = $request->request->all();
-            return $this->redirect( $this->generateUrl($type, array( 'session' => $session, 'campus' => $data['campus'] )) );
+            if (isset($data['date1'])) {
+                return $this->redirect( $this->generateUrl($type, array( 'session' => $session, 'campus' => $data['campus'], 'f_i' => $data['date1'], 'f_f' => $data['date2'] )) );
+            }else{
+                return $this->redirect( $this->generateUrl($type, array( 'session' => $session, 'campus' => $data['campus'] )) );
+            }
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -95,16 +99,6 @@ class ReportsController extends Controller
 
         $where = " AND u.campus = '".$campus."' ";
 
-        // $usuarios = $em->createQueryBuilder()
-        //   ->from('CoreAdminBundle:Radcheck', 'r')
-        //   ->select("r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo,u.ssid,s.macaddress as macaddress1,m.macaddress as macaddress2")
-        //   ->leftJoin("CoreAdminBundle:Users", "u", "WITH", "r.username=u.username")
-        //   ->leftJoin("CoreAdminBundle:Ssidmacauth", "s", "WITH", "s.username=u.username")
-        //   ->leftJoin("CoreAdminBundle:Ssidmacauth", "m", "WITH", "m.username=u.username AND m.macaddress != s.macaddress")
-        //   ->where("r.username != ''".$where)
-        //   ->groupBy("r.username")
-        // ->getQuery();
-
         $usuarios = $em->createQueryBuilder()
           ->from('CoreAdminBundle:Radcheck', 'r')
           ->select("r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo,u.ssid,s.macaddress as macaddress1,m.macaddress as macaddress2")
@@ -152,13 +146,13 @@ class ReportsController extends Controller
             $grid->addExport(new ExcelExport('Exportar usuarios actuales', 'usuarios_registrados'));
 
             $macRowAction = new RowAction('Macaddress', 'admin_usuarios_eliminar_macs', false, '_self');
-            $macRowAction->setRouteParameters(array('session' => $session, 'id' ));
+            $macRowAction->setRouteParameters(array('session' => $session, 'id', 'campus' => $campus ));
             $macRowAction->setColumn('actions');
             $grid->addRowAction($macRowAction);
         }
 
         $delRowAction = new RowAction('Eliminar', 'admin_usuarios_eliminar', false, '_self');
-        $delRowAction->setRouteParameters(array('session' => $session, 'id' ));
+        $delRowAction->setRouteParameters(array('session' => $session, 'id', 'campus' => $campus ));
         $delRowAction->setColumn('actions');
         $grid->addRowAction($delRowAction);
 
@@ -290,6 +284,53 @@ class ReportsController extends Controller
         $myRowAction = new RowAction('', 'admin_reportes_listar_unreg', false, '_self');
         $myRowAction->setRouteParameters(array('session' => $session, 'campus' => $campus ));
         $grid->addRowAction($myRowAction);
+
+        return $grid->getGridResponse('CoreAdminBundle:reports:history.html.twig', array('num_res' => $num_res));
+    }
+    /***************************************************************************/
+    public function maintenanceAction(Request $request,$session,$campus)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $sesssion = $this->getRequest()->getSession();
+        $nom = $sesssion->get('admin_nom');
+
+        $where = " AND u.campus = '".$campus."' ";
+
+        $query = $em->createQuery(
+            "SELECT u.id,u.username,u.firstname,u.secondname,u.email,u.matricula,u.campus,u.tipo,u.ssid
+            FROM CoreAdminBundle:Users u
+            WHERE u.username != '---' ".$where."
+            ORDER BY u.username ASC"
+        );
+
+        $usuarios = $query->getResult();
+
+        $num_res = count($usuarios);
+
+        $columns = array(
+            new Column\NumberColumn(array('id' => 'id', 'visible' => false, 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'id', 'source' => true, 'align' => 'center', 'title' => 'ID')),
+            new Column\TextColumn(array('id' => 'username', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'username', 'source' => true, 'title' => 'Usuario')),
+            new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'firstname', 'source' => true, 'align' => 'center', 'title' => 'Nombre')),
+            new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'secondname', 'source' => true, 'align' => 'center', 'title' => 'Apellidos')),
+            new Column\TextColumn(array('id' => 'email', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'email', 'source' => true, 'align' => 'center', 'title' => 'Email')),
+            new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
+            new Column\TextColumn(array('id' => 'campus', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
+            new Column\TextColumn(array('id' => 'tipo', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
+            new Column\TextColumn(array('id' => 'ssid', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'ssid', 'source' => true, 'align' => 'center', 'title' => 'Ssid')),
+        );
+
+        $source = new Vector($usuarios,$columns);
+        $grid = $this->get('grid');
+        $grid->setSource($source);
+        
+        $grid->setLimits(array(25, 50, 100));
+        $grid->setPage(1);
+
+        $editRowAction = new RowAction('Limpiar', 'admin_usuarios_limpiar', false, '_self');
+        $editRowAction->setRouteParameters(array('session' => $session, 'id', 'campus' => $campus ));
+        $editRowAction->setColumn('actions');
+        $grid->addRowAction($editRowAction);
 
         return $grid->getGridResponse('CoreAdminBundle:reports:history.html.twig', array('num_res' => $num_res));
     }

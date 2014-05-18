@@ -19,7 +19,7 @@
                 </tr>
                 <tr align="center"><tr align="center">
                     <th width="35%"></th>
-                    <th width="10%" valign="middle"> <form name="ususrios" action="{{ path('admin_usuarios_eliminar', {session: session_id, id: usuario.id}) }}" method="POST"><input type="image" src="{{ asset('bundles/core/img/users/aprove.png') }}" value="Submit" alt="Submit"><input type="hidden" name="confirm" value="1"><br>Aceptar</form> </th>
+                    <th width="10%" valign="middle"> <form name="ususrios" action="{{ path('admin_usuarios_eliminar', {session: session_id, id: usuario.id, campus: campus}) }}" method="POST"><input type="image" src="{{ asset('bundles/core/img/users/aprove.png') }}" value="Submit" alt="Submit"><input type="hidden" name="confirm" value="1"><br>Aceptar</form> </th>
                     <th width="10%"></th>
                     <th width="10%" valign="middle"> <form name="ususrios" action="{{ path('admin_reportes_listar_reg', {session: session_id, campus: campus}) }}" method="POST"><input type="image" src="{{ asset('bundles/core/img/users/del.png') }}" value="Submit" alt="Submit"><br>Cancelar</form> </th>
                     <th width="35%"></th>

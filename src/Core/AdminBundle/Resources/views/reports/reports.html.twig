@@ -1,20 +1,37 @@
 {% extends 'CoreAdminBundle:admin:layout.html.twig' %}
 {% block content %}
 
-    {{ include('CoreAdminBundle:reports:style-grid.html.twig') }}
+    {{ include('CoreAdminBundle:reports:style-datepicker.html.twig') }}
 
     <div>
         <div id="title">
             <h1>Usuarios :: Campus</h1>
         </div>
         <form action="{{ path('admin_reportes', {session: app.session.get('session_id'), type: type}) }}" method="POST">
-	    	<select name="campus" onChange="this.form.submit()">
+        	<label for="campus">Campus: </label>
+	    	<select name="campus">
 	    		<option value="0">--- Seleccione el campus ---</option>
 			{% for name in campus %}
 		        <option value="{{ name.nom }}">{{ name.nombre }}</option>
 		    {% endfor %}
 	    	</select>
+	    	{% if (type != 'admin_reportes_listar_unreg') and (type != 'admin_reportes_listar_reg') and (type != 'admin_reportes_activos') and (type != 'admin_reportes_historial') and (type != 'admin_reportes_mantenimiento') %}
+	    	&nbsp;&nbsp;&nbsp;<label for="date1">Fecha inicial: </label>
+	    	<input type="text" id="date1" name="date1" value="">
+	    	&nbsp;&nbsp;&nbsp;<label for="date2">Fecha final: </label>
+	    	<input type="text" id="date2" name="date2" value="">
+	    	{% endif %}
+	    	<button class="button" type="button" onClick="this.form.submit()">Consultar</button>
 	    </form>
     </div>
-
+	{% if (type != 'admin_reportes_listar_unreg') and (type != 'admin_reportes_listar_reg') and (type != 'admin_reportes_activos') and (type != 'admin_reportes_historial') and (type != 'admin_reportes_mantenimiento') %}
+    <script type="text/javascript">
+    	var date = new Date();
+		date.setMonth(date.getMonth() - 3);
+    	$('#date1').val( $.datepicker.formatDate('dd-mm-yy', date) );
+    	$('#date1').datepicker({ regional: "es", dateFormat: "dd-mm-yy", minDate: "-3m", maxDate: "+0d" });
+    	$('#date2').val( $.datepicker.formatDate('dd-mm-yy', new Date()) );
+    	$('#date2').datepicker({ regional: "es", dateFormat: "dd-mm-yy", minDate: "-3m", maxDate: "+0d" });
+	</script>
+	{% endif %}
 {% endblock %}

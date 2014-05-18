@@ -23,12 +23,16 @@ admin_usuarios_modificar:
     defaults: { _controller: CoreAdminBundle:Users:edit }
 
 admin_usuarios_eliminar_macs:
-    pattern:  /admin/users/delmac/{session}/{id}/
+    pattern:  /admin/users/delmac/{session}/{id}/{campus}/
     defaults: { _controller: CoreAdminBundle:Users:delmac }
 
 admin_usuarios_eliminar:
-    pattern:  /admin/users/del/{session}/{id}/
+    pattern:  /admin/users/del/{session}/{id}/{campus}/
     defaults: { _controller: CoreAdminBundle:Users:del }
+
+admin_usuarios_limpiar:
+    pattern:  /admin/users/clear/{session}/{id}/{campus}/
+    defaults: { _controller: CoreAdminBundle:Users:clear }
 
 admin_reset_macs:
     pattern:  /admin/users/resetmacs/
@@ -55,6 +59,10 @@ admin_reportes_activos:
 admin_reportes_historial:
     pattern:  /admin/reports/history/{session}/{campus}/
     defaults: { _controller: CoreAdminBundle:Reports:history }
+
+admin_reportes_mantenimiento:
+    pattern:  /admin/reports/maintenance/{session}/{campus}/
+    defaults: { _controller: CoreAdminBundle:Reports:maintenance }
 
 ##### PORTAL :: LOGIN #####
 

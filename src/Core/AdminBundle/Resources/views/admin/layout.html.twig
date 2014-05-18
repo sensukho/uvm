@@ -10,6 +10,7 @@
 		<script src="{{ asset('/web/bundles/admin/js/skel.min.js') }}"></script>
 		<script src="{{ asset('/web/bundles/admin/js/skel-panels.min.js') }}"></script>
 		<script src="{{ asset('/web/bundles/admin/js/init.js') }}"></script>
+		<script src="{{ asset('/web/bundles/admin/js/jquery-ui.min.js') }}"></script>
 		<noscript>
 			<link rel="stylesheet" href="{{ asset('/web/bundles/admin/css/skel-noscript.css') }}" />
 			<link rel="stylesheet" href="{{ asset('/web/bundles/admin/css/style.css') }}" />
@@ -58,10 +59,11 @@
 								<ul>
 									<li class="current_page_item">Reportes</li>
 								{% if app.session.get('admin_nom') == 'UVM' %}
+									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_mantenimiento'}) }}">Mantenimiento de Usuarios</a></li>
 									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_listar_unreg'}) }}">Usuarios Pendientes</a></li>
 									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_listar_reg'}) }}">Usuarios Registrados</a></li>
 									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_activos'}) }}">Usuarios Activos</a></li>
-									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_historial'}) }}">Historial</a></li>
+									<li><a href="{{ path('admin_reportes', {session: app.session.get('session_id'), type: 'admin_reportes_historial'}) }}">Historial de Usuarios</a></li>
 								{% else %}
 									<li><a href="{{ path('admin_reportes_listar_unreg', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Usuarios Pendientes</a></li>
 									<li><a href="{{ path('admin_reportes_listar_reg', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Usuarios Registrados</a></li>

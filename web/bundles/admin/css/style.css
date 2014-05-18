@@ -156,10 +156,10 @@
 		form textarea
 		{
 			border-radius: 0.4em;
-			-webkit-appearance: none;
+			/*-webkit-appearance: none;*/
 			border: solid 1px #ddd;
 			padding: 0.5em;
-			width: 100%;
+			/*width: 100%;*/
 		}
 
 		form input:focus,
@@ -261,9 +261,9 @@
 	.button
 	{
 		background-color: #c94663;
-		background-image: url('/web/bundles/admin/images/bg1.png');
 		border-radius: 0.4em;
 		text-align: center;
+		cursor: pointer;
 		box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.15);
 		color: #fff;
 		font-family: 'Open Sans Condensed', sans-serif;
