@@ -21,7 +21,9 @@ class LoginController extends Controller
 	$params = '?';
         if( $request->query->all() ){
             foreach ($request->query->all() as $key => $value) {
-                $params .= $key.'='.$value.'&';
+                if ( $key == 'sip' || $key == 'client_mac' || $key == 'ssid' || $key == 'auth' ) {
+                    $params .= $key.'='.$value.'&';
+                }
             }
         }
         return $this->redirect( "/web/login/".$params );
@@ -33,10 +35,17 @@ class LoginController extends Controller
 
         $sesssion->get('session_id');
 
+        $ssid = NULL;
+        $mac = NULL;
+        $sip = NULL;
+        $user_data = NULL;
+
         if( $request->query->all() ){
             $params = '?';
             foreach ($request->query->all() as $key => $value) {
-                $params .= $key.'='.$value.'&';
+                if ( $key == 'sip' || $key == 'client_mac' || $key == 'ssid' || $key == 'auth' ) {
+                    $params .= $key.'='.$value.'&';
+                }
             }
             $url = explode('&', $params);
         }else{
@@ -63,6 +72,10 @@ class LoginController extends Controller
         if ( isset($auth) && $auth[1] == "failed" ) {
             return $this->redirect( "/web/login/error/" );
         }
+
+	if ($request->isMethod('POST')) {
+		$sesssion->remove('user_reg');
+	}
 
         $request = Request::createFromGlobals();
         $user = $request->request->get('username',NULL);
@@ -105,7 +118,7 @@ class LoginController extends Controller
             $raduser2 = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
                 array(
                     'username'  => $user,
-                    'ssid'  => urldecode( $ssid[1] )
+                    'ssid'  => urldecode( trim($ssid[1]) )
                 )
             );
             if (count($raduser2) < 1) {
@@ -114,7 +127,7 @@ class LoginController extends Controller
                         'username'  => $user
                     )
                 );
-                $msg = 'A este usuario le corresponde la red "'.$user_data->getSsid().'" ( Conectado a: "'.urldecode( $ssid[1] ).'" ). Por favor cambie de red WiFi e intente de nuevo.';
+                $msg = 'A este usuario le corresponde la red "'.$user_data->getSsid().'" ( Conectado a: "'.urldecode( trim($ssid[1]) ).'" ). Por favor cambie de red WiFi e intente de nuevo.';
                 return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => $user, 'pass' => $pass, 'chk' => $chk, 'msg' => $msg, 'params' => $params ));
             }
 
@@ -177,11 +190,15 @@ class LoginController extends Controller
     /***************************************************************************/
     public function welcomeAction()
     {
+	$sesssion->remove('user_reg');
         return $this->render('CoreAdminBundle:login:bienvenida.html.twig', array());
     }
     /***************************************************************************/
     public function registerAction(Request $request)
     {
+	$sesssion = $this->getRequest()->getSession();
+	$sesssion->remove('user_reg');
+
         $usuario = new Users();
         $msg = '';
 
@@ -279,7 +296,9 @@ class LoginController extends Controller
                         ;
                         $this->get('mailer')->send($message);
 
-                        return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => '', 'pass' => '', 'chk' => '', 'msg' => $msg, 'params' => $params ));
+			$sesssion->set('user_reg', $msg);
+			return $this->redirect( "http://www.universidad-uvm.mx" );
+                        //return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => '', 'pass' => '', 'chk' => '', 'msg' => $msg, 'params' => $params ));
                     }else{
                         $msg = "El nombre de usuario seleccionado ya está utilizado por otra cuenta. Favor de elegir otro.";
                         return $this->render('CoreAdminBundle:login:register.html.twig', array( 'form' => $form->createView(), 'msg' => $msg, 'errors' => '', 'params' => $params ));
@@ -299,6 +318,9 @@ class LoginController extends Controller
     /***************************************************************************/
     public function resetAction(Request $request)
     {
+	$sesssion = $this->getRequest()->getSession();
+	$sesssion->remove('user_reg');
+
         $msg = '';
 
         if( $request->query->all() ){

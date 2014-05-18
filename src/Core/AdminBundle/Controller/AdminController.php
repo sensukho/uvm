@@ -15,7 +15,6 @@ class AdminController extends Controller
     public function adminAction()
     {
         $sesssion = $this->getRequest()->getSession();
-        $sesssion->invalidate();
 
         return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => '' ));
     }
@@ -62,10 +61,8 @@ class AdminController extends Controller
         $nombre = $sesssion->get('admin_nombre');
         $nom = $sesssion->get('admin_nom');
 
-        $session_id = base64_encode( md5( $nombre.$nom.date('Y-n-d') ) );
-
-        if ($session_id === $session ) {
-            return $this->render('CoreAdminBundle:admin:lpg.html.twig', array());
+        if ( $sesssion->get('admin_nom') ) {
+            return $this->render('CoreAdminBundle:admin:lpg.html.twig', array( 'msg' => '' ));
         }else{
             return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión ha caducado, ingrese de nuevo por favor.' ));
         }
