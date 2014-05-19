@@ -332,7 +332,7 @@ class ReportsController extends Controller
         $editRowAction->setColumn('actions');
         $grid->addRowAction($editRowAction);
 
-        return $grid->getGridResponse('CoreAdminBundle:reports:history.html.twig', array('num_res' => $num_res));
+        return $grid->getGridResponse('CoreAdminBundle:reports:maintenance.html.twig', array('num_res' => $num_res));
     }
 ########## COMODIN FUNCTIONS  ##########
     /***************************************************************************/
