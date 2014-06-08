@@ -51,7 +51,7 @@ class AdminController extends Controller
                 return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Esta cuenta se encuetra deshabilitada.' ));
             }
         }else{
-            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Usuario y/o contraseña iválidos.' ));
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Usuario y/o contraseña inválidos.' ));
         }
     }
     /***************************************************************************/

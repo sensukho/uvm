@@ -355,13 +355,12 @@ class UsersController extends Controller
     public function resetmacsAction()
     {
         $em = $this->getDoctrine()->getManager();
-
-        $em = $this->getDoctrine()->getManager();
         $conn = $em->getConnection();
 
         $conn->exec('TRUNCATE TABLE ssidmacauth');
 
         return $this->render('CoreAdminBundle:users:resetmacs.html.twig', array( 'fecha' => date('d-M-Y H:m a') ));
+
     }
     /***************************************************************************/
     public function valForm( $data )
