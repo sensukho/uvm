@@ -24,7 +24,7 @@ class ReportsController extends Controller
         if ($request->isMethod('POST')) {
             $data = $request->request->all();
             if (isset($data['date1'])) {
-                return $this->redirect( $this->generateUrl($type, array( 'session' => $session, 'campus' => $data['campus'], 'f_i' => $data['date1'], 'f_f' => $data['date2'] )) );
+                return $this->redirect( $this->generateUrl($type, array( 'session' => $session, 'campus' => $data['campus'], 'i' => $data['date1'], 'f' => $data['date2'] )) );
             }else{
                 return $this->redirect( $this->generateUrl($type, array( 'session' => $session, 'campus' => $data['campus'] )) );
             }
@@ -80,10 +80,6 @@ class ReportsController extends Controller
         if ($nom == 'UVM') {
             $grid->addExport(new ExcelExport('Exportar usuarios actuales', 'usuarios_pendientes'));
         }
-
-        // $myRowAction = new RowAction('', 'admin_reportes_listar_unreg', false, '_self');
-        // $myRowAction->setRouteParameters(array('session' => $session, 'campus' => $campus ));
-        // $grid->addRowAction($myRowAction);
 
         return $grid->getGridResponse('CoreAdminBundle:reports:listunreg.html.twig', array('msg' => $msg, 'num_res' => $num_res));
     }
@@ -159,7 +155,7 @@ class ReportsController extends Controller
         return $grid->getGridResponse('CoreAdminBundle:reports:listreg.html.twig', array('msg' => $msg, 'num_res' => $num_res));
     }
     /***************************************************************************/
-	public function activeAction(Request $request,$session,$campus)
+	public function activeAction(Request $request,$session,$campus,$i,$f)
     {
 
         $em = $this->getDoctrine()->getManager();
@@ -172,10 +168,18 @@ class ReportsController extends Controller
         $query = $em->createQuery(
             "SELECT u.id,r.username,u.matricula,u.campus,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
             FROM CoreAdminBundle:Radacct r,CoreAdminBundle:Users u
-            WHERE r.acctstoptime = '0000-00-00 00:00:00' AND r.username = u.username ".$where."
+            WHERE r.acctstoptime = '0000-00-00 00:00:00' AND r.username = u.username ".$where." AND ( r.acctstarttime BETWEEN '".$i."' AND '".$f."' )
             GROUP BY r.username
             ORDER BY r.username ASC"
         );
+
+        $q = "SELECT u.id,r.username,u.matricula,u.campus,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
+            FROM CoreAdminBundle:Radacct r,CoreAdminBundle:Users u
+            WHERE r.acctstoptime = '0000-00-00 00:00:00' AND r.username = u.username ".$where." AND ( r.acctstarttime BETWEEN '".$i."' AND '".$f."' )
+            GROUP BY r.username
+            ORDER BY r.username ASC";
+
+        // var_dump($q);
 
         $usuarios = $query->getResult();
 
@@ -217,14 +221,10 @@ class ReportsController extends Controller
             $grid->addExport(new ExcelExport('Exportar usuarios actuales', 'usuarios_activos'));
         }
 
-        $myRowAction = new RowAction('', 'admin_reportes_listar_unreg', false, '_self');
-        $myRowAction->setRouteParameters(array('session' => $session, 'campus' => $campus ));
-        $grid->addRowAction($myRowAction);
-
         return $grid->getGridResponse('CoreAdminBundle:reports:active.html.twig', array('num_res' => $num_res));
     }
     /***************************************************************************/
-    public function historyAction(Request $request,$session,$campus)
+    public function historyAction(Request $request,$session,$campus,$i,$f)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -236,10 +236,18 @@ class ReportsController extends Controller
         $query = $em->createQuery(
             "SELECT r.username,u.matricula,u.campus,r.id,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
             FROM CoreAdminBundle:Radacct r,CoreAdminBundle:Users u
-            WHERE r.username = u.username ".$where."
+            WHERE r.username = u.username ".$where." AND ( r.acctstarttime BETWEEN '".$i."' AND '".$f."' )
             GROUP BY r.username
             ORDER BY r.username ASC"
         );
+
+        $q = "SELECT r.username,u.matricula,u.campus,r.id,r.framedipaddress,r.calledstationid,SUM(r.acctinputoctets),SUM(r.acctoutputoctets),SUM(r.acctsessiontime)
+            FROM CoreAdminBundle:Radacct r,CoreAdminBundle:Users u
+            WHERE r.username = u.username ".$where." AND ( r.acctstarttime BETWEEN '".$i."' AND '".$f."' )
+            GROUP BY r.username
+            ORDER BY r.username ASC";
+
+        // var_dump($q);
 
         $usuarios = $query->getResult();
 
@@ -280,10 +288,6 @@ class ReportsController extends Controller
         if ($nom == 'UVM') {
             $grid->addExport(new ExcelExport('Exportar usuarios actuales', 'usuarios_historial'));
         }
-
-        $myRowAction = new RowAction('', 'admin_reportes_listar_unreg', false, '_self');
-        $myRowAction->setRouteParameters(array('session' => $session, 'campus' => $campus ));
-        $grid->addRowAction($myRowAction);
 
         return $grid->getGridResponse('CoreAdminBundle:reports:history.html.twig', array('num_res' => $num_res));
     }

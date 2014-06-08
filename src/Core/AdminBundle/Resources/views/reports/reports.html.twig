@@ -15,7 +15,7 @@
 		        <option value="{{ name.nom }}">{{ name.nombre }}</option>
 		    {% endfor %}
 	    	</select>
-	    	{% if (type != 'admin_reportes_listar_unreg') and (type != 'admin_reportes_listar_reg') and (type != 'admin_reportes_activos') and (type != 'admin_reportes_historial') and (type != 'admin_reportes_mantenimiento') %}
+	    	{% if (type == 'admin_reportes_activos') or (type == 'admin_reportes_historial') %}
 	    	&nbsp;&nbsp;&nbsp;<label for="date1">Fecha inicial: </label>
 	    	<input type="text" id="date1" name="date1" value="">
 	    	&nbsp;&nbsp;&nbsp;<label for="date2">Fecha final: </label>
@@ -24,14 +24,14 @@
 	    	<button class="button" type="button" onClick="this.form.submit()">Consultar</button>
 	    </form>
     </div>
-	{% if (type != 'admin_reportes_listar_unreg') and (type != 'admin_reportes_listar_reg') and (type != 'admin_reportes_activos') and (type != 'admin_reportes_historial') and (type != 'admin_reportes_mantenimiento') %}
+	{% if (type == 'admin_reportes_activos') or (type == 'admin_reportes_historial') %}
     <script type="text/javascript">
     	var date = new Date();
-		date.setMonth(date.getMonth() - 3);
-    	$('#date1').val( $.datepicker.formatDate('dd-mm-yy', date) );
-    	$('#date1').datepicker({ regional: "es", dateFormat: "dd-mm-yy", minDate: "-3m", maxDate: "+0d" });
-    	$('#date2').val( $.datepicker.formatDate('dd-mm-yy', new Date()) );
-    	$('#date2').datepicker({ regional: "es", dateFormat: "dd-mm-yy", minDate: "-3m", maxDate: "+0d" });
+		date.setMonth(date.getMonth() - 1);
+    	$('#date1').val( $.datepicker.formatDate('yy-mm-dd', date) );
+    	$('#date1').datepicker({ regional: "es", dateFormat: "yy-mm-dd", minDate: "-3m", maxDate: "+0d" });
+    	$('#date2').val( $.datepicker.formatDate('yy-mm-dd', new Date()) );
+    	$('#date2').datepicker({ regional: "es", dateFormat: "yy-mm-dd", minDate: "-3m", maxDate: "+0d" });
 	</script>
 	{% endif %}
 {% endblock %}

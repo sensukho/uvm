@@ -372,17 +372,17 @@ class UsersController extends Controller
         }elseif (!preg_match('/^[a-zA-Z ]{3,}$/', $data['form']['secondname']) && $data['form']['secondname'] != '') {
             $msg = "Los campos \"nombre\" y \"Apellidos\" deben contener solo caracteres alfabéticos y por lo menos 3 caracteres de longitud";
             return $msg;
-        }elseif (!preg_match('/^[0-9]{3,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
+        }elseif (!preg_match('/^[0-9]{4,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
             $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
             return $msg;
-        }elseif(!preg_match("/^[a-zA-Z0-9]+[a-zA-Z0-9-_]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$/", $data['form']['email']) && $data['form']['email'] != ''){
+        }elseif(!filter_var($data['form']['email'], FILTER_VALIDATE_EMAIL) && $data['form']['email'] != ''){
             $msg = "El campo \"E-mail\" no contiene el formato adecuado";
             return $msg;
-        }elseif (!preg_match('/^[a-zA-Z0-9]{5,}$/', $data['form']['username']) && $data['form']['username'] != '') {
-            $msg = "El campo \"Usuario\" debe contener solo caracteres alfanuméricos  y por lo menos 5 caracteres de longitud";
+        }elseif (!preg_match('/^[a-zA-Z0-9]{5,10}$/', $data['form']['username']) && $data['form']['username'] != '') {
+            $msg = "El campo \"Usuario\" debe contener solo caracteres alfanuméricos, por lo menos 5 caracteres de longitud y un máximo de 10 caracteres";
             return $msg;
-        }elseif (!preg_match('/^[a-zA-Z0-9]{6,}$/', $data['form']['newpass']) && $data['form']['newpass'] != '') {
-            $msg = "El campo \"contraseña\" debe contener solo caracteres alfanuméricos  y por lo menos 6 caracteres de longitud";
+        }elseif (!preg_match('/^[a-zA-Z0-9]{6,12}$/', $data['form']['newpass']) && $data['form']['newpass'] != '') {
+            $msg = "El campo \"contraseña\" debe contener solo caracteres alfanuméricos  y por lo menos 6 caracteres de longitud y un máximo de 12 caracteres";
             return $msg;
         }
         return NULL;

@@ -53,11 +53,11 @@ admin_reportes_listar_unreg:
     defaults: { _controller: CoreAdminBundle:Reports:listunreg }
 
 admin_reportes_activos:
-    pattern:  /admin/reports/active/{session}/{campus}/
+    pattern:  /admin/reports/active/{session}/{campus}/{i}/{f}/
     defaults: { _controller: CoreAdminBundle:Reports:active }
 
 admin_reportes_historial:
-    pattern:  /admin/reports/history/{session}/{campus}/
+    pattern:  /admin/reports/history/{session}/{campus}/{i}/{f}/
     defaults: { _controller: CoreAdminBundle:Reports:history }
 
 admin_reportes_mantenimiento:
