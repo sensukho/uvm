@@ -55,6 +55,18 @@ class AdminController extends Controller
         }
     }
     /***************************************************************************/
+    public function logoutAction()
+    {
+        $sesssion = new Session();
+        $sesssion->start();
+
+        $sesssion->remove('admin_nombre');
+        $sesssion->remove('admin_nom');
+        $sesssion->remove('session_id');
+
+        return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => '' ));
+    }
+    /***************************************************************************/
     public function homeAction($session)
     {
         $sesssion = $this->getRequest()->getSession();

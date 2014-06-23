@@ -296,8 +296,8 @@ class LoginController extends Controller
                         ;
                         $this->get('mailer')->send($message);
 
-			$sesssion->set('user_reg', $msg);
-			return $this->redirect( "http://www.universidad-uvm.mx" );
+                        $sesssion->set('user_reg', $msg);
+                        return $this->redirect( "http://www.universidad-uvm.mx" );
                         //return $this->render('CoreAdminBundle:login:plantilla.html.twig', array( 'user' => '', 'pass' => '', 'chk' => '', 'msg' => $msg, 'params' => $params ));
                     }else{
                         $msg = "El nombre de usuario seleccionado ya está utilizado por otra cuenta. Favor de elegir otro.";

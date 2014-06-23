@@ -8,6 +8,10 @@ admin_login:
     pattern:  /admin/login/
     defaults: { _controller: CoreAdminBundle:Admin:login }
 
+admin_logout:
+    pattern:  /admin/logout/
+    defaults: { _controller: CoreAdminBundle:Admin:logout }
+
 admin_home:
     pattern:  /admin/{session}/
     defaults: { _controller: CoreAdminBundle:Admin:home }

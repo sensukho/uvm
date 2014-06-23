@@ -32,7 +32,7 @@ class UsersController extends Controller
         $campus = array();
         $msg = '';
         if (!$session_id) {
-            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión ha caducado, ingrese de nuevo por favor.' ));
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión se ha cerrado, ingrese de nuevo por favor.' ));
         }
         /*************************************************/
         /** END Session
@@ -162,14 +162,14 @@ class UsersController extends Controller
             )
         );
 
-	$user_form->setFirstname( $usuario->getFirstname() );
-        $user_form->setSecondname( $usuario->getSecondname() );
-        $user_form->setMatricula( $usuario->getMatricula() );
-        $user_form->setEmail( $usuario->getEmail() );
-        $user_form->setUsername( $usuario->getUsername() );
-        $user_form->setCampus( $usuario->getCampus() );
-        $user_form->setTipo( $usuario->getTipo() );
-        $user_form->setNewpass( $usuario->getNewpass() );
+    	$user_form->setFirstname( $usuario->getFirstname() );
+            $user_form->setSecondname( $usuario->getSecondname() );
+            $user_form->setMatricula( $usuario->getMatricula() );
+            $user_form->setEmail( $usuario->getEmail() );
+            $user_form->setUsername( $usuario->getUsername() );
+            $user_form->setCampus( $usuario->getCampus() );
+            $user_form->setTipo( $usuario->getTipo() );
+            $user_form->setNewpass( $usuario->getNewpass() );
 
         $form = $this->createFormBuilder($user_form)
             ->setAction( $this->generateUrl('admin_usuarios_modificar', array( 'session' => $session, 'id' => $id, 'username' => $username )) )
@@ -203,6 +203,22 @@ class UsersController extends Controller
                     'username'  => $username
                 )
             );
+
+            $usuarioR = $em->getRepository('CoreAdminBundle:Users')->findBy(
+                array(
+                    'username'  => $username
+                )
+            );
+
+            var_dump( count( $usuarioR ) );
+
+            $msg = "El nombre de usuario seleccionado ya está utilizado por otra cuenta. Favor de elegir otro.";
+
+            if (count($usuarioR) > 1) {
+                return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $nom ));
+            }
+
+
             $usuario2 = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findBy(
                 array(
                     'username'  => $username,

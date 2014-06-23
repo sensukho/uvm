@@ -34,6 +34,11 @@ class ReportsController extends Controller
 
         $sesssion = $this->getRequest()->getSession();
         $nom = $sesssion->get('admin_nom');
+        $session_id = $sesssion->get('session_id');
+
+        if (!$session_id) {
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión se ha cerrado, ingrese de nuevo por favor.' ));
+        }
 
         $query = $em->createQuery("SELECT c.nom,c.nombre FROM CoreAdminBundle:Campus c WHERE c.nom != 'UVM' AND c.activo = 1 ORDER BY c.nom ASC");
         $result = $query->getResult();
@@ -48,6 +53,11 @@ class ReportsController extends Controller
 
         $sesssion = $this->getRequest()->getSession();
         $nom = $sesssion->get('admin_nom');
+        $session_id = $sesssion->get('session_id');
+
+        if (!$session_id) {
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión se ha cerrado, ingrese de nuevo por favor.' ));
+        }
 
         $where = " AND u.campus = '".$campus."' ";
 
@@ -92,12 +102,17 @@ class ReportsController extends Controller
 
         $sesssion = $this->getRequest()->getSession();
         $nom = $sesssion->get('admin_nom');
+        $session_id = $sesssion->get('session_id');
+
+        if (!$session_id) {
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión se ha cerrado, ingrese de nuevo por favor.' ));
+        }
 
         $where = " AND u.campus = '".$campus."' ";
 
         $usuarios = $em->createQueryBuilder()
           ->from('CoreAdminBundle:Radcheck', 'r')
-          ->select("r.id,r.username,u.firstname,u.secondname,u.matricula,u.campus,u.tipo,u.ssid,s.macaddress as macaddress1,m.macaddress as macaddress2")
+          ->select("r.id,r.username,u.firstname,u.secondname,u.email,u.matricula,u.ssid,s.macaddress as macaddress1,m.macaddress as macaddress2")
           ->leftJoin("CoreAdminBundle:Users", "u", "WITH", "r.username=u.username")
           ->leftJoin("CoreAdminBundle:Ssidmacauth", "s", "WITH", "s.username=r.username")
           ->leftJoin("CoreAdminBundle:Ssidmacauth", "m", "WITH", "m.username=r.username AND m.macaddress != s.macaddress")
@@ -115,8 +130,7 @@ class ReportsController extends Controller
             new Column\TextColumn(array('id' => 'firstname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'firstname', 'source' => true, 'title' => 'Nombre')),
             new Column\TextColumn(array('id' => 'secondname', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'secondname', 'source' => true, 'title' => 'Apellidos')),
             new Column\TextColumn(array('id' => 'matricula', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'matricula', 'source' => true, 'align' => 'center', 'title' => 'Matrícula')),
-            new Column\TextColumn(array('id' => 'campus', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'campus', 'source' => true, 'align' => 'center', 'title' => 'Campus')),
-            new Column\TextColumn(array('id' => 'tipo', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'select', 'selectFrom' => 'values', 'values' => array("ALUM"=>"Estudiantes","EMP"=>"Docentes"), 'size' => '-1', 'field' => 'tipo', 'source' => true, 'align' => 'center', 'title' => 'Tipo')),
+            new Column\TextColumn(array('id' => 'email', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'email', 'source' => true, 'align' => 'center', 'title' => 'Email')),
             new Column\TextColumn(array('id' => 'ssid', 'filterable' => false, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'ssid', 'source' => true, 'align' => 'center', 'title' => 'SSID')),
             new Column\TextColumn(array('id' => 'macaddress1', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'macaddress1', 'source' => true, 'align' => 'center', 'title' => 'Macaddress1')),
             new Column\TextColumn(array('id' => 'macaddress2', 'filterable' => true, 'operatorsVisible' => false, 'filter' => 'input', 'size' => '-1', 'field' => 'macaddress2', 'source' => true, 'align' => 'center', 'title' => 'Macaddress2')),
@@ -162,6 +176,11 @@ class ReportsController extends Controller
 
         $sesssion = $this->getRequest()->getSession();
         $nom = $sesssion->get('admin_nom');
+        $session_id = $sesssion->get('session_id');
+
+        if (!$session_id) {
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión se ha cerrado, ingrese de nuevo por favor.' ));
+        }
 
         $where = " AND u.campus = '".$campus."' ";
 
@@ -230,6 +249,11 @@ class ReportsController extends Controller
 
         $sesssion = $this->getRequest()->getSession();
         $nom = $sesssion->get('admin_nom');
+        $session_id = $sesssion->get('session_id');
+
+        if (!$session_id) {
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión se ha cerrado, ingrese de nuevo por favor.' ));
+        }
 
         $where = " AND u.campus = '".$campus."' ";
 
@@ -298,6 +322,11 @@ class ReportsController extends Controller
 
         $sesssion = $this->getRequest()->getSession();
         $nom = $sesssion->get('admin_nom');
+        $session_id = $sesssion->get('session_id');
+
+        if (!$session_id) {
+            return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión se ha cerrado, ingrese de nuevo por favor.' ));
+        }
 
         $where = " AND u.campus = '".$campus."' ";
 

@@ -13,9 +13,11 @@
 <!-- Start Form -->
     <div id="cform" class="card move-form" style="">
     <p class="mpf widget-text"><h2>Registro:</h2></p>
+<!-- <p class="mpf widget-text" style="text-align:right;">Si la <b>matricula</b> empieza con ceros, favor de omitirlos</p> -->
     <div id="register">
         <p style="text-align:justify;">Para tener acceso a la red WiFi de UVM es necesario realizar el proceso de <b>REGISTRO</b>:</p>
         <button type="button" id="entrar" name="entrar" id="sub-a" class="button blue sub-btn" onclick="window.location.href='{{ path('portal') }}'">Ingreso</button>
+        <p style="text-align:justify;">Si la <b>matricula</b> empieza con ceros, favor de omitirlos</p>
     </div>
         {% if msg %}
             <center><p class="mpf widget-text" style="background-color:brown;color:white">{{ msg }}</p></center>
@@ -29,6 +31,10 @@
     <div id="rightClip" class="mobile-remove">
         <!-- Start Widgets -->
         <div id="widgets" style="left:40px">
+            <div class="" style="display: block;">
+                <img src="/web/bundles/login/img/general.png" style="">
+                <p class="mpf widget-text" style=""><h3>Si la <b>matricula</b> empieza con ceros, favor de omitirlos</h3></p>
+            </div>
             <div class="" style="display: block;">
                 <img src="/web/bundles/login/img/general.png" style="">
                 <p class="mpf widget-text" style=""><h3>Debes ingresar una cuenta válida de e-mail, ya que se te enviarán los datos de tu registro.</h3></p>
