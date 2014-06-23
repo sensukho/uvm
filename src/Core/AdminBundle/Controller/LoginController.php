@@ -511,7 +511,8 @@ class LoginController extends Controller
         if (!preg_match('/^[0-9]{3,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
             $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
             return $msg;
-        }elseif(!preg_match("/^[a-z0-9]+[a-z0-9-_]+(\.[_a-zA-Z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*$/", $data['form']['email']) && $data['form']['email'] != ''){
+        // }elseif(!preg_match("/^[a-z0-9]+[a-z0-9-_]+(\.[_a-zA-Z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*$/", $data['form']['email']) && $data['form']['email'] != ''){
+        }elseif(!filter_var($data['form']['email'], FILTER_VALIDATE_EMAIL) && $data['form']['email'] != ''){
             $msg = "El campo \"E-mail\" no contiene el formato adecuado";
             return $msg;
         }elseif(!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data['form']['genpass']) && $data['form']['genpass'] != ''){

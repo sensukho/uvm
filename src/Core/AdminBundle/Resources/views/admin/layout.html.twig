@@ -67,8 +67,8 @@
 								{% else %}
 									<li><a href="{{ path('admin_reportes_listar_unreg', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Usuarios Pendientes</a></li>
 									<li><a href="{{ path('admin_reportes_listar_reg', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Usuarios Registrados</a></li>
-									<li><a href="{{ path('admin_reportes_activos', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Usuarios Activos</a></li>
-									<li><a href="{{ path('admin_reportes_historial', {session: app.session.get('session_id'), campus: app.session.get('admin_nom')}) }}">Historial</a></li>
+									<li><a href="{{ path('admin_reportes_activos', {session: app.session.get('session_id'), campus: app.session.get('admin_nom'), i: '2014-05-19', f: '2014-06-19'}) }}">Usuarios Activos</a></li>
+									<li><a href="{{ path('admin_reportes_historial', {session: app.session.get('session_id'), campus: app.session.get('admin_nom'), i: '2014-05-19', f: '2014-06-19'}) }}">Historial</a></li>
 								{% endif %}
 								</ul>
 							</nav>
