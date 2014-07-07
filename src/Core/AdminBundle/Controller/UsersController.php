@@ -186,38 +186,47 @@ class UsersController extends Controller
 
         if ($request->isMethod('POST')) {
 
+            $user_id = $usuario->getId();
+            $user_username = $usuario->getUsername();
             $data = $request->request->all();
 
-            /*************************************************/
-            /** START Validacion
-            /*************************************************/
             if ($msg = $this->valForm( $data )) {
                   return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $nom ));
-              } 
-            /*************************************************/
-            /** END Validacion
-            /*************************************************/
+              }
+
+            $usuarioR = $em->getRepository('CoreAdminBundle:Users')->findBy(
+                array(
+                    'username'  => $data['form']['username']
+                )
+            );
+
+            if (count($usuarioR) == 1) {
+                if ($usuarioR[0]->getId() != $user_id) {
+                    $msg = "El nombre de usuario seleccionado ya está utilizado por otra cuenta. Favor de elegir otro.";
+                    return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $nom ));
+                }
+            }elseif (count($usuarioR) > 1) {
+                if ($nom == 'UVM') {
+                    $ids = '';
+                    foreach ($usuarioR as $value) {
+                        $ids .= ' ['.$value->getId().']';
+                    }
+                    $msg = "EL usuario que eligió existe en mas de una ocación en nuestra base de datos, favor de enviar los siguientes IDs al Desarrollador del sistema para realizar el reset.";
+                    $msg .= "( ".$ids." )";
+                    return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $nom ));
+
+                }else{
+                    $msg = "El nombre de usuario seleccionado ya está utilizado por otra cuenta. Favor de elegir otro.";
+                    return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $nom ));
+                }
+            }
+
             $usuario = $em->getRepository('CoreAdminBundle:Radcheck')->find($id);
             $usuario1 = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
                 array(
                     'username'  => $username
                 )
             );
-
-            $usuarioR = $em->getRepository('CoreAdminBundle:Users')->findBy(
-                array(
-                    'username'  => $username
-                )
-            );
-
-            var_dump( count( $usuarioR ) );
-
-            $msg = "El nombre de usuario seleccionado ya está utilizado por otra cuenta. Favor de elegir otro.";
-
-            if (count($usuarioR) > 1) {
-                return $this->render('CoreAdminBundle:users:edit.html.twig', array( 'form' => $form->createView(),'session' => $session, 'session_id' => $session, 'usuario' => $usuario, 'msg' => $msg, 'campus' => $nom ));
-            }
-
 
             $usuario2 = $em->getRepository('CoreAdminBundle:Ssidmacauth')->findBy(
                 array(
@@ -318,6 +327,7 @@ class UsersController extends Controller
             $em->persist($usuario_users);
             $em->flush();
 
+            $mensaje = "El usuario ha sido eliminado con éxito!";
             return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'campus' => $campus )) );
         }else{
             $mensaje = "¿Seguro que desea eliminar al usuario '".$usuario_radchek->getUsername()."' ?";
@@ -388,7 +398,7 @@ class UsersController extends Controller
             $msg = "Los campos \"nombre\" y \"Apellidos\" deben contener solo caracteres alfabéticos y por lo menos 3 caracteres de longitud";
             return $msg;
         }elseif (!preg_match('/^[0-9]{4,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
-            $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
+            $msg = "El campo \"Matrícula\" debe contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
             return $msg;
         }elseif(!filter_var($data['form']['email'], FILTER_VALIDATE_EMAIL) && $data['form']['email'] != ''){
             $msg = "El campo \"E-mail\" no contiene el formato adecuado";
@@ -412,7 +422,7 @@ class UsersController extends Controller
             $msg = "Los campos \"nombre\" y \"Apellidos\" deben contener solo caracteres alfabéticos y por lo menos 3 caracteres de longitud";
             return $msg;
         }elseif (!preg_match('/^[0-9]{4,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
-            $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
+            $msg = "El campo \"Matrícula\" debe contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
             return $msg;
         }
         return NULL;

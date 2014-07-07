@@ -215,7 +215,7 @@ class LoginController extends Controller
         $usuario->setFecha( new \DateTime('today') );
         $form = $this->createFormBuilder($usuario)
             ->setAction($this->generateUrl('portal_register'))
-                ->add('matricula', 'text', array('label' => 'Matrícula: ','attr' => array()))
+                ->add('matricula', 'text', array('label' => 'Matrícula: ','attr' => array('placeholder' => 'Omitir ceros al principio')))
                 ->add('email', 'email', array('label' => 'E-mail: ','attr' => array()))
                 ->add('genpass', 'email', array('label' => 'Confirmar: ','attr' => array()))
                 ->add('username', 'text', array('label' => 'Usuario: ','attr' => array('pattern' => '.{5,}')))
@@ -240,11 +240,9 @@ class LoginController extends Controller
                 ->add('enviar', 'submit', array('attr' => array('class' => 'button blue sub-btn')))
             ->getForm();
             
-            /***** START VALIDATE *****/
             if ($msg = $this->valForm( $data )) {
                   return $this->render('CoreAdminBundle:login:register.html.twig', array( 'form' => $form->createView(), 'msg' => $msg, 'errors' => '', 'params' => $params));
-              } 
-            /***** END VALIDATE *****/
+            }
 
             $em = $this->getDoctrine()->getManager();
             $user = $em->getRepository('CoreAdminBundle:Users')->findOneBy(
@@ -508,21 +506,20 @@ class LoginController extends Controller
     /***************************************************************************/
     public function valForm( $data )
     {
-        if (!preg_match('/^[0-9]{3,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
-            $msg = "El campo \"Matricula\" debe deben contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
+        if (!preg_match('/^[0-9]{4,}$/', $data['form']['matricula']) && $data['form']['matricula'] != '') {
+            $msg = "El campo \"Matrícula\" debe contener solo caracteres numéricos y por lo menos 4 caracteres de longitud";
             return $msg;
-        // }elseif(!preg_match("/^[a-z0-9]+[a-z0-9-_]+(\.[_a-zA-Z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*$/", $data['form']['email']) && $data['form']['email'] != ''){
         }elseif(!filter_var($data['form']['email'], FILTER_VALIDATE_EMAIL) && $data['form']['email'] != ''){
             $msg = "El campo \"E-mail\" no contiene el formato adecuado";
             return $msg;
-        }elseif(!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data['form']['genpass']) && $data['form']['genpass'] != ''){
-            $msg = "El campo \"Confirmación de E-mail\" no contiene el formato adecuado";
+        }elseif(!filter_var($data['form']['genpass'], FILTER_VALIDATE_EMAIL) && $data['form']['genpass'] != ''){
+            $msg = "El campo \"E-mail\" no contiene el formato adecuado";
             return $msg;
         }elseif ( $data['form']['email'] !== $data['form']['genpass'] ) {
             $msg = "Los campos de \"E-mail\" deben coincidir.";
             return $msg;
-        }elseif (!preg_match('/^[a-zA-Z0-9]{5,}$/', $data['form']['username']) && $data['form']['username'] != '') {
-            $msg = "El campo \"Usuario\" debe contener solo caracteres alfanuméricos  y por lo menos 5 caracteres de longitud";
+        }elseif (!preg_match('/^[a-zA-Z0-9]{5,10}$/', $data['form']['username']) && $data['form']['username'] != '') {
+            $msg = "El campo \"Usuario\" debe contener solo caracteres alfanuméricos, por lo menos 5 caracteres de longitud y un máximo de 10 caracteres";
             return $msg;
         }elseif (!preg_match('/^[a-zA-Z0-9]{6,}$/', $data['form']['newpass']) && $data['form']['newpass'] != '') {
             $msg = "El campo \"contraseña\" debe contener solo caracteres alfanuméricos  y por lo menos 6 caracteres de longitud";
