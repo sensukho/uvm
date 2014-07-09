@@ -104,6 +104,9 @@ class ReportsController extends Controller
         $nom = $sesssion->get('admin_nom');
         $session_id = $sesssion->get('session_id');
 
+        $request = Request::createFromGlobals();
+        $msg = $request->get('msg',NULL);
+
         if (!$session_id) {
             return $this->render('CoreAdminBundle:admin:index.html.twig', array( 'msg' => 'Su sesión se ha cerrado, ingrese de nuevo por favor.' ));
         }

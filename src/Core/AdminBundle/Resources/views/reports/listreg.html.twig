@@ -5,6 +5,9 @@
     <div id="title">
         <h1>Usuarios :: Registrados :: Encontrados: {{ num_res }}</h1>
     </div>
+    {% if msg %}
+        <center><p class="mpf widget-text" style="background-color:brown;color:white">{{ msg }}</p></center>
+    {% endif %}
     {% if grid %}
     <div>
         {{ grid(grid) }}

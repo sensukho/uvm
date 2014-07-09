@@ -328,9 +328,9 @@ class UsersController extends Controller
             $em->flush();
 
             $mensaje = "El usuario ha sido eliminado con éxito!";
-            return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'campus' => $campus )) );
+            return $this->redirect( $this->generateUrl('admin_reportes_listar_reg', array( 'session' => $session, 'campus' => $campus, 'msg' => $mensaje )) );
         }else{
-            $mensaje = "¿Seguro que desea eliminar al usuario '".$usuario_radchek->getUsername()."' ?";
+            $mensaje = "¿Seguro que desea eliminar al usuario ' ".$usuario_radchek->getUsername()." ' ?";
         }
         return $this->render('CoreAdminBundle:users:del.html.twig', array( 'session' => $session, 'session_id' => $session, 'msg' => $mensaje, 'usuario' => $usuario_radchek, 'campus' => $campus ));
     }
@@ -428,6 +428,13 @@ class UsersController extends Controller
         return NULL;
     }
     /***************************************************************************/
+     // /var/www/Proyects/uvm/vendor/apy/datagrid-bundle/APY/DataGridBundle/DependencyInjection/Configuration.php:
 
+     // /var/www/Proyects/uvm/vendor/apy/datagrid-bundle/APY/DataGridBundle/Resources/translations/messages.en.xliff:
+
+     // /var/www/Proyects/uvm/vendor/apy/datagrid-bundle/APY/DataGridBundle/Resources/translations/messages.es.xliff:
+
+     // /var/www/Proyects/uvm/vendor/apy/datagrid-bundle/APY/DataGridBundle/Resources/views/blocks.html.twig:
+    /***************************************************************************/
 ##########  ##########
 }
