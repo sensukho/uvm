@@ -190,6 +190,7 @@ class LoginController extends Controller
     /***************************************************************************/
     public function welcomeAction()
     {
+    $sesssion = $this->getRequest()->getSession();
 	$sesssion->remove('user_reg');
         return $this->render('CoreAdminBundle:login:bienvenida.html.twig', array());
     }
