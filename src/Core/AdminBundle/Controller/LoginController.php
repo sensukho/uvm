@@ -391,6 +391,9 @@ class LoginController extends Controller
     /***************************************************************************/
     public function changeAction(Request $request)
     {
+        $sesssion = $this->getRequest()->getSession();
+        $sesssion->remove('user_reg');
+        
         $msg = '';
         $usuario = new Users();
         $form = $this->createFormBuilder($usuario)
